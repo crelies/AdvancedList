@@ -1,5 +1,9 @@
 # AdvancedList
 
+[![Swift5](https://img.shields.io/badge/swift5-compatible-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
+[![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com/de/ios)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?longCache=true&style=flat-square)](https://en.wikipedia.org/wiki/MIT_License)
+
 This package provides a wrapper view around the **SwiftUI** `List view` which adds an empty, error and loading state including a corresponding view.
 
 ## How to use

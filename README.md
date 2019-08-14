@@ -6,6 +6,10 @@
 
 This package provides a wrapper view around the **SwiftUI** `List view` which adds an empty, error and loading state including a corresponding view.
 
+## Installation
+
+Add this Swift package in Xcode using its Github repository url. (File > Swift Packages > Add Package Dependency...)
+
 ## How to use
 
 You control the view through an instance of `ListService`. The service manages the current state and the items of the list.

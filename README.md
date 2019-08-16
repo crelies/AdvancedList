@@ -17,7 +17,19 @@ Use it to append, update or remove items and to modify the state of the list. Th
 
 ### Pagination
 
+The `Pagination` is implemented as a class (conforming to `ObservableObject`) so the `AdvancedList` can observe it. If the `isLoading` property of the `Pagination` changes the `AdvancedList` updates itself to show or hide the `LoadingView`. Update the `isLoading` property everytime you start or stop fetching the next page.
+
 If you want to use pagination you can choose between the `lastItemPagination` and the `thresholdItemPagination`. Both concepts are described [here](https://github.com/crelies/ListPagination). Just pass `.lastItemPagination` or `.thresholdItemPagination` including the required parameters to the `AdvancedList` initializer.
+
+Both pagination types require
+
+- a **LoadingView** (**ViewBuilder**)
+- a block (**shouldLoadNextPage**) which is called if the `last or threshold item appeared` and
+- the initial loading state (**Bool**) of the pagination which determines the visibility of the **LoadingView**.
+
+The `thresholdItemPagination` expects an offset parameter (number of items before the last item) to determine the threshold item.
+
+**The `LoadingView` is only displayed right below the last item of the list if the `isLoading` property of the `Pagination` is true.**
 
 **Skip pagination setup by using `.noPagination`.**
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum AdvancedListPaginationType {
+enum AdvancedListPaginationType {
     case lastItem
     case thresholdItem(offset: Int)
     case noPagination

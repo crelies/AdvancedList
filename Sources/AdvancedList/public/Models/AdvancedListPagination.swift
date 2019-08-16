@@ -21,11 +21,27 @@ public final class AdvancedListPagination<LoadingView: View>: ObservableObject {
         }
     }
     
-    public init(@ViewBuilder loadingView: @escaping () -> LoadingView, type: AdvancedListPaginationType, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) {
+    init(@ViewBuilder loadingView: @escaping () -> LoadingView, type: AdvancedListPaginationType, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) {
         self.loadingView = loadingView
         self.type = type
         self.shouldLoadNextPage = shouldLoadNextPage
         self.isLoading = isLoading
+    }
+}
+
+extension AdvancedListPagination {
+    public static func lastItemPagination(@ViewBuilder loadingView: @escaping () -> LoadingView, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) -> AdvancedListPagination {
+        AdvancedListPagination(loadingView: loadingView,
+                               type: .lastItem,
+                               shouldLoadNextPage: shouldLoadNextPage,
+                               isLoading: isLoading)
+    }
+    
+    public static func thresholdItemPagination(@ViewBuilder loadingView: @escaping () -> LoadingView, offset: Int, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) -> AdvancedListPagination {
+        AdvancedListPagination(loadingView: loadingView,
+                               type: .thresholdItem(offset: offset),
+                               shouldLoadNextPage: shouldLoadNextPage,
+                               isLoading: isLoading)
     }
 }
 

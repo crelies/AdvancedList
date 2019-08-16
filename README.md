@@ -4,11 +4,7 @@
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com/de/ios)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?longCache=true&style=flat-square)](https://en.wikipedia.org/wiki/MIT_License)
 
-This package provides a wrapper view around the **SwiftUI** `List view` which adds an empty, error and loading state including a corresponding view.
-
-## TODO
-
-- Adding pagination support through my [ListPagination Swift package](https://github.com/crelies/ListPagination) (**WIP**)
+This package provides a wrapper view around the **SwiftUI** `List view` which adds **pagination** (through my [ListPagination package](https://github.com/crelies/ListPagination)) and an **empty**, **error** and **loading state** including a corresponding view.
 
 ## Installation
 
@@ -18,6 +14,12 @@ Add this Swift package in Xcode using its Github repository url. (File > Swift P
 
 You control the view through an instance of `ListService`. The service manages the current state and the items of the list.
 Use it to append, update or remove items and to modify the state of the list. The view listens to the service and updates itself if needed.
+
+### Pagination
+
+If you want to use pagination you can choose between the `lastItemPagination` and the `thresholdItemPagination`. Both concepts are described [here](https://github.com/crelies/ListPagination). Just pass `.lastItemPagination` or `.thresholdItemPagination` including the required parameters to the `AdvancedList` initializer.
+
+**Skip pagination setup by using `.noPagination`.**
 
 ## Example
 
@@ -41,5 +43,5 @@ AdvancedList(listService: listService, emptyStateView: {
     }
 }, loadingStateView: {
     Text("Loading ...")
-})
+}, pagination: .noPagination)
 ```

@@ -6,6 +6,10 @@
 
 This package provides a wrapper view around the **SwiftUI** `List view` which adds an empty, error and loading state including a corresponding view.
 
+## TODO
+
+- Adding pagination support through my [ListPagination Swift package](https://github.com/crelies/ListPagination) (**WIP**)
+
 ## Installation
 
 Add this Swift package in Xcode using its Github repository url. (File > Swift Packages > Add Package Dependency...)

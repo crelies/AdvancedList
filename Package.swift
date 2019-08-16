@@ -13,10 +13,13 @@ let package = Package(
             name: "AdvancedList",
             targets: ["AdvancedList"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/crelies/ListPagination", from: "0.1.0")
+    ],
     targets: [
         .target(
             name: "AdvancedList",
-            dependencies: []),
+            dependencies: ["ListPagination"]),
         .testTarget(
             name: "AdvancedListTests",
             dependencies: ["AdvancedList"]),

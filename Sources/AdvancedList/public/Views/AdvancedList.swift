@@ -9,12 +9,13 @@
 import ListPagination
 import SwiftUI
 
-public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationLoadingView: View> : View {
+public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View {
     @ObservedObject private var listService: ListService
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
-    @ObservedObject private var pagination: AdvancedListPagination<PaginationLoadingView>
+    @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
+    @State private var isLastItem: Bool = false
     
     public var body: AnyView {
         switch listService.listState {
@@ -25,16 +26,20 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
             case .items:
                 if !listService.items.isEmpty {
                     return AnyView(
-                        List(listService.items) { item in
-                            VStack {
+                        VStack {
+                            List(listService.items) { item in
                                 item
                                 .onAppear {
                                     self.listItemAppears(item)
+                                    
+                                    if self.listService.items.isLastItem(item) {
+                                        self.isLastItem = true
+                                    }
                                 }
-                                
-                                if self.pagination.isLoading && self.listService.items.isLastItem(item) {
-                                    self.pagination.loadingView()
-                                }
+                            }
+                            
+                            if isLastItem {
+                                getPaginationStateView()
                             }
                         }
                     )
@@ -50,7 +55,7 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
         }
     }
     
-    public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationLoadingView>) {
+    public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
         self.listService = listService
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView
@@ -74,6 +79,21 @@ extension AdvancedList {
                 }
             case .noPagination: ()
         }
+    }
+    
+    private func getPaginationStateView() -> AnyView {
+        var paginationStateView = AnyView(EmptyView())
+        
+        switch pagination.state {
+            case .error(let error):
+                paginationStateView = AnyView(pagination.errorView(error))
+            case .idle:
+                paginationStateView = AnyView(EmptyView())
+            case .loading:
+                paginationStateView = AnyView(pagination.loadingView())
+        }
+        
+        return paginationStateView
     }
 }
 

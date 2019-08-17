@@ -8,48 +8,53 @@
 import Combine
 import SwiftUI
 
-public final class AdvancedListPagination<LoadingView: View>: ObservableObject {
+public final class AdvancedListPagination<ErrorView: View, LoadingView: View>: ObservableObject {
+    let errorView: (Error) -> ErrorView
     let loadingView: () -> LoadingView
     let type: AdvancedListPaginationType
     let shouldLoadNextPage: () -> Void
     
     public let objectWillChange = PassthroughSubject<Void, Never>()
     
-    public var isLoading: Bool {
+    public var state: AdvancedListPaginationState {
         didSet {
             objectWillChange.send()
         }
     }
     
-    init(@ViewBuilder loadingView: @escaping () -> LoadingView, type: AdvancedListPaginationType, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) {
+    init(@ViewBuilder errorView: @escaping (Error) -> ErrorView, @ViewBuilder loadingView: @escaping () -> LoadingView, type: AdvancedListPaginationType, shouldLoadNextPage: @escaping () -> Void, state: AdvancedListPaginationState) {
+        self.errorView = errorView
         self.loadingView = loadingView
         self.type = type
         self.shouldLoadNextPage = shouldLoadNextPage
-        self.isLoading = isLoading
+        self.state = state
     }
 }
 
 extension AdvancedListPagination {
-    public static func lastItemPagination(@ViewBuilder loadingView: @escaping () -> LoadingView, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) -> AdvancedListPagination {
-        AdvancedListPagination(loadingView: loadingView,
+    public static func lastItemPagination(@ViewBuilder errorView: @escaping (Error) -> ErrorView, @ViewBuilder loadingView: @escaping () -> LoadingView, shouldLoadNextPage: @escaping () -> Void, state: AdvancedListPaginationState) -> AdvancedListPagination {
+        AdvancedListPagination(errorView: errorView,
+                               loadingView: loadingView,
                                type: .lastItem,
                                shouldLoadNextPage: shouldLoadNextPage,
-                               isLoading: isLoading)
+                               state: state)
     }
     
-    public static func thresholdItemPagination(@ViewBuilder loadingView: @escaping () -> LoadingView, offset: Int, shouldLoadNextPage: @escaping () -> Void, isLoading: Bool) -> AdvancedListPagination {
-        AdvancedListPagination(loadingView: loadingView,
+    public static func thresholdItemPagination(@ViewBuilder errorView: @escaping (Error) -> ErrorView, @ViewBuilder loadingView: @escaping () -> LoadingView, offset: Int, shouldLoadNextPage: @escaping () -> Void, state: AdvancedListPaginationState) -> AdvancedListPagination {
+        AdvancedListPagination(errorView: errorView,
+                               loadingView: loadingView,
                                type: .thresholdItem(offset: offset),
                                shouldLoadNextPage: shouldLoadNextPage,
-                               isLoading: isLoading)
+                               state: state)
     }
 }
 
-extension AdvancedListPagination where LoadingView == EmptyView {
+extension AdvancedListPagination where ErrorView == EmptyView, ErrorView == LoadingView {
     public static var noPagination: AdvancedListPagination {
-        AdvancedListPagination(loadingView: { LoadingView() },
+        AdvancedListPagination(errorView: { _ in ErrorView() },
+                               loadingView: { LoadingView() },
                                type: .noPagination,
                                shouldLoadNextPage: {},
-                               isLoading: false)
+                               state: .idle)
     }
 }

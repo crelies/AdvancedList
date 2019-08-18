@@ -17,19 +17,20 @@ Use it to append, update or remove items and to modify the state of the list. Th
 
 ### Pagination
 
-The `Pagination` is implemented as a class (conforming to `ObservableObject`) so the `AdvancedList` can observe it. If the `isLoading` property of the `Pagination` changes the `AdvancedList` updates itself to show or hide the `LoadingView`. Update the `isLoading` property everytime you start or stop fetching the next page.
+The `Pagination` is implemented as a class (conforming to `ObservableObject`) so the `AdvancedList` can observe it.
+It has three different states: `error`, `idle` and `loading`. If the `state` of the `Pagination` changes the `AdvancedList` updates itself to show or hide the state related view (`ErrorView` for state `.error(Error)` or `LoadingView` for state `.loading`, `.idle` will display nothing). Update the `state` if you start loading (`.loading`), stop loading ( `.idle`) or if an error occurred (`.error(Error)`) so the `AdvancedList` can render the appropriate view.
 
 If you want to use pagination you can choose between the `lastItemPagination` and the `thresholdItemPagination`. Both concepts are described [here](https://github.com/crelies/ListPagination). Just pass `.lastItemPagination` or `.thresholdItemPagination` including the required parameters to the `AdvancedList` initializer.
 
 Both pagination types require
 
-- a **LoadingView** (**ViewBuilder**)
+- an **ErrorView** and a **LoadingView** (**ViewBuilder**)
 - a block (**shouldLoadNextPage**) which is called if the `last or threshold item appeared` and
-- the initial loading state (**Bool**) of the pagination which determines the visibility of the **LoadingView**.
+- the initial state (**AdvancedListPaginationState**) of the pagination which determines the visibility of the pagination state related view.
 
 The `thresholdItemPagination` expects an offset parameter (number of items before the last item) to determine the threshold item.
 
-**The `LoadingView` is only displayed right below the last item of the list if the `isLoading` property of the `Pagination` is true.**
+**The ErrorView or LoadingView will only be visible below the List if the last item of the List appeared! That way the user is only interrupted if needed.**
 
 **Skip pagination setup by using `.noPagination`.**
 
@@ -44,7 +45,7 @@ AdvancedList(listService: listService, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     VStack {
-        Text(error?.localizedDescription ?? "Error")
+        Text(error.localizedDescription)
             .lineLimit(nil)
         
         Button(action: {

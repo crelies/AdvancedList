@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 
-public final class AdvancedListPagination<ErrorView: View, LoadingView: View>: ObservableObject {
+public final class AdvancedListPagination<ErrorView: View, LoadingView: View>: NSObject, ObservableObject {
     let errorView: (Error) -> ErrorView
     let loadingView: () -> LoadingView
     let type: AdvancedListPaginationType

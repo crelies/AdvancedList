@@ -119,7 +119,8 @@ struct AdvancedList_Previews : PreviewProvider {
             }, loadingStateView: {
                 Text("Loading ...")
             }, pagination: .noPagination)
-            .navigationBarTitle(Text("List of Items"))
+            // TODO: why is this modifier not working on macOS?
+//            .navigationBarTitle(Text("List of Items"))
         }
     }
 }

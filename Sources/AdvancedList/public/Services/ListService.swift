@@ -10,7 +10,7 @@ import Combine
 import Foundation
 import SwiftUI
 
-public final class ListService: ObservableObject {
+public final class ListService: NSObject, ObservableObject {
     public let objectWillChange = PassthroughSubject<Void, Never>()
     
     public private(set) var items: [AnyListItem] = [] {
@@ -24,8 +24,6 @@ public final class ListService: ObservableObject {
             objectWillChange.send()
         }
     }
-    
-    public init() {}
     
     public func appendItems<Item: Identifiable>(_ items: [Item]) where Item: View {
         let anyListItems = items.map { AnyListItem(item: $0) }

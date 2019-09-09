@@ -78,6 +78,7 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
+        self.pagination = pagination
     }
     #endif
 }

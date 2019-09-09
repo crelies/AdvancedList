@@ -10,12 +10,19 @@ import ListPagination
 import SwiftUI
 
 public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View {
+    #if !targetEnvironment(macCatalyst)
     @ObservedObject private var listService: ListService
+    #endif
+    
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
     @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
     @State private var isLastItem: Bool = false
+    
+    #if targetEnvironment(macCatalyst)
+    @EnvironmentObject var listService: ListService
+    #endif
     
     public var body: AnyView {
         switch listService.listState {
@@ -55,6 +62,7 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
         }
     }
     
+    #if !targetEnvironment(macCatalyst)
     public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
         self.listService = listService
         self.emptyStateView = emptyStateView
@@ -62,6 +70,16 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
         self.loadingStateView = loadingStateView
         self.pagination = pagination
     }
+    #endif
+    
+    #if targetEnvironment(macCatalyst)
+    public init(@ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        self.pagination = pagination
+    }
+    #endif
 }
 
 extension AdvancedList {

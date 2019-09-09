@@ -9,22 +9,46 @@
 import ListPagination
 import SwiftUI
 
+#if !targetEnvironment(macCatalyst)
 public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View {
-    #if !targetEnvironment(macCatalyst)
     @ObservedObject private var listService: ListService
     @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
-    #endif
-    
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
     @State private var isLastItem: Bool = false
     
-    #if targetEnvironment(macCatalyst)
-    @EnvironmentObject var listService: ListService
-    @EnvironmentObject var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
-    #endif
+    public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
+        self.listService = listService
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        self.pagination = pagination
+    }
+}
+#else
+public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View {
+    private let emptyStateView: () -> EmptyStateView
+    private let errorStateView: (Error) -> ErrorStateView
+    private let loadingStateView: () -> LoadingStateView
+    @State private var isLastItem: Bool = false
     
+    @EnvironmentObject var listService: ListService
+    /*
+        We have to erase the types of the pagination error and loading view
+        because currently there is no way to specify the types
+     */
+    @EnvironmentObject var pagination: AdvancedListPagination<AnyView, AnyView>
+    
+    public init(@ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+    }
+}
+#endif
+
+extension AdvancedList {
     public var body: AnyView {
         switch listService.listState {
             case .error(let error):
@@ -62,22 +86,6 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
                 )
         }
     }
-    
-    #if !targetEnvironment(macCatalyst)
-    public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
-        self.listService = listService
-        self.emptyStateView = emptyStateView
-        self.errorStateView = errorStateView
-        self.loadingStateView = loadingStateView
-        self.pagination = pagination
-    }
-    #else
-    public init(@ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.emptyStateView = emptyStateView
-        self.errorStateView = errorStateView
-        self.loadingStateView = loadingStateView
-    }
-    #endif
 }
 
 extension AdvancedList {
@@ -117,47 +125,51 @@ extension AdvancedList {
 struct AdvancedList_Previews : PreviewProvider {
     private static let listService = ListService()
     
+    #if targetEnvironment(macCatalyst)
     static var previews: some View {
         NavigationView {
-            #if targetEnvironment(macCatalyst)
-                AdvancedList(emptyStateView: {
-                    Text("No data")
-                }, errorStateView: { error in
-                    VStack {
-                        Text(error.localizedDescription)
-                        .lineLimit(nil)
-                        
-                        Button(action: {
-                            // do something
-                        }) {
-                            Text("Retry")
-                        }
+            AdvancedList(emptyStateView: {
+                Text("No data")
+            }, errorStateView: { error in
+                VStack {
+                    Text(error.localizedDescription)
+                    .lineLimit(nil)
+                    
+                    Button(action: {
+                        // do something
+                    }) {
+                        Text("Retry")
                     }
-                }, loadingStateView: {
-                    Text("Loading ...")
-                })
-                .environmentObject(listService)
-                .environmentObject(.noPagination)
-            #else
-                AdvancedList(listService: listService, emptyStateView: {
-                    Text("No data")
-                }, errorStateView: { error in
-                    VStack {
-                        Text(error.localizedDescription)
-                        .lineLimit(nil)
-                        
-                        Button(action: {
-                            // do something
-                        }) {
-                            Text("Retry")
-                        }
-                    }
-                }, loadingStateView: {
-                    Text("Loading ...")
-                }, pagination: .noPagination)
-//                .navigationBarTitle(Text("List of Items"))
-            #endif
+                }
+            }, loadingStateView: {
+                Text("Loading ...")
+            })
+            .environmentObject(listService)
+            .environmentObject(AdvancedListPagination.noPagination)
         }
     }
+    #else
+    static var previews: some View {
+        NavigationView {
+            AdvancedList(listService: listService, emptyStateView: {
+                Text("No data")
+            }, errorStateView: { error in
+                VStack {
+                    Text(error.localizedDescription)
+                    .lineLimit(nil)
+                    
+                    Button(action: {
+                        // do something
+                    }) {
+                        Text("Retry")
+                    }
+                }
+            }, loadingStateView: {
+                Text("Loading ...")
+            }, pagination: .noPagination)
+//            .navigationBarTitle(Text("List of Items"))
+        }
+    }
+    #endif
 }
 #endif

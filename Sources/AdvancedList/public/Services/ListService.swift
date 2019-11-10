@@ -26,7 +26,7 @@ public final class ListService: NSObject, ObservableObject {
     }
 
     public var supportedListActions: AdvancedListActions = .none
-    public var excludeItem: ((AnyListItem) -> Bool)?
+    public var excludeItem: (AnyListItem) -> Bool = { _ in false }
     
     public func appendItems<Item: Identifiable>(_ items: [Item]) where Item: View {
         let anyListItems = items.map { AnyListItem(item: $0) }

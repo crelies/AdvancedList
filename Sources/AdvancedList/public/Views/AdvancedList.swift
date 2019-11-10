@@ -79,7 +79,7 @@ extension AdvancedList {
         case .delete(let onDelete):
             return AnyView(List {
                 ForEach(listService.items) { item in
-                    if !(self.listService.excludeItem?(item) ?? false) {
+                    if !self.listService.excludeItem(item) {
                         item
                             .onAppear {
                                 self.listItemAppears(item)
@@ -96,7 +96,7 @@ extension AdvancedList {
         case .move(let onMove):
             return AnyView(List {
                 ForEach(listService.items) { item in
-                    if !(self.listService.excludeItem?(item) ?? false) {
+                    if !self.listService.excludeItem(item) {
                         item
                             .onAppear {
                                 self.listItemAppears(item)
@@ -113,7 +113,7 @@ extension AdvancedList {
         case .moveAndDelete(let onMove, let onDelete):
             return AnyView(List {
                 ForEach(listService.items) { item in
-                    if !(self.listService.excludeItem?(item) ?? false) {
+                    if !self.listService.excludeItem(item) {
                         item
                             .onAppear {
                                 self.listItemAppears(item)
@@ -131,7 +131,7 @@ extension AdvancedList {
             })
         case .none:
             return AnyView(List(listService.items) { item in
-                if !(self.listService.excludeItem?(item) ?? false) {
+                if !self.listService.excludeItem(item) {
                     item
                         .onAppear {
                             self.listItemAppears(item)
@@ -149,12 +149,12 @@ extension AdvancedList {
         var paginationStateView = AnyView(EmptyView())
         
         switch pagination.state {
-            case .error(let error):
-                paginationStateView = AnyView(pagination.errorView(error))
-            case .idle:
-                paginationStateView = AnyView(EmptyView())
-            case .loading:
-                paginationStateView = AnyView(pagination.loadingView())
+        case .error(let error):
+            paginationStateView = AnyView(pagination.errorView(error))
+        case .idle:
+            paginationStateView = AnyView(EmptyView())
+        case .loading:
+            paginationStateView = AnyView(pagination.loadingView())
         }
         
         return paginationStateView

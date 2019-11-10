@@ -34,6 +34,16 @@ The `thresholdItemPagination` expects an offset parameter (number of items befor
 
 **Skip pagination setup by using `.noPagination`.**
 
+### Move and delete items
+
+You can define which actions your list should support through the `supportedListActions` property of your `ListService` instance.
+Choose between `delete`, `move`, `moveAndDelete` and `none`. The default is `none`.
+
+### Filtering
+
+The `AdvancedList` supports filtering (disabled by default). You only have to set the closure `excludeItem: (AnyListItem) -> Bool)` on your `ListService` instance.
+`AnyListItem` gives you access to the item (`Any`). **Keep in mind that you have to cast this item to your custom type!**
+
 ## Example
 
 The following code shows how easy-to-use the view is:

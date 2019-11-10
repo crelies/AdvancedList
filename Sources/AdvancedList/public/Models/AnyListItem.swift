@@ -10,10 +10,12 @@ import Foundation
 import SwiftUI
 
 public struct AnyListItem: Identifiable, View {
+    public let item: Any
     public let id: AnyHashable
     public let body: AnyView
     
     public init<Item: Identifiable>(item: Item) where Item: View {
+        self.item = item
         id = item.id
         body = AnyView(item)
     }

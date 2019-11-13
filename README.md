@@ -1,21 +1,21 @@
 # AdvancedList
 
 [![Swift5](https://img.shields.io/badge/swift5-compatible-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com)
+[![Platforms](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20tvOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?longCache=true&style=flat-square)](https://en.wikipedia.org/wiki/MIT_License)
 
 This package provides a wrapper view around the **SwiftUI** `List view` which adds **pagination** (through my [ListPagination package](https://github.com/crelies/ListPagination)) and an **empty**, **error** and **loading state** including a corresponding view.
 
-## Installation
+## 📦 Installation
 
 Add this Swift package in Xcode using its Github repository url. (File > Swift Packages > Add Package Dependency...)
 
-## How to use
+## 🚀 How to use
 
 You control the view through an instance of `ListService`. The service manages the current state and the items of the list.
 Use it to append, update or remove items and to modify the state of the list. The view listens to the service and updates itself if needed.
 
-### Pagination
+### 📄 Pagination
 
 The `Pagination` is implemented as a class (conforming to `ObservableObject`) so the `AdvancedList` can observe it.
 It has three different states: `error`, `idle` and `loading`. If the `state` of the `Pagination` changes the `AdvancedList` updates itself to show or hide the state related view (`ErrorView` for state `.error(Error)` or `LoadingView` for state `.loading`, `.idle` will display nothing). Update the `state` if you start loading (`.loading`), stop loading ( `.idle`) or if an error occurred (`.error(Error)`) so the `AdvancedList` can render the appropriate view.
@@ -34,17 +34,17 @@ The `thresholdItemPagination` expects an offset parameter (number of items befor
 
 **Skip pagination setup by using `.noPagination`.**
 
-### Move and delete items
+### 📁 Move and 🗑️ delete items
 
 You can define which actions your list should support through the `supportedListActions` property of your `ListService` instance.
 Choose between `delete`, `move`, `moveAndDelete` and `none`. The default is `none`.
 
-### Filtering
+### 🎛️ Filtering
 
 The `AdvancedList` supports filtering (disabled by default). You only have to set the closure `excludeItem: (AnyListItem) -> Bool)` on your `ListService` instance.
 `AnyListItem` gives you access to the item (`Any`). **Keep in mind that you have to cast this item to your custom type!**
 
-## Example
+## 🎁 Example
 
 The following code shows how easy-to-use the view is:
 

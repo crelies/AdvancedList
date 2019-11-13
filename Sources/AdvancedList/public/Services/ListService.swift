@@ -11,19 +11,8 @@ import Foundation
 import SwiftUI
 
 public final class ListService: NSObject, ObservableObject {
-    public let objectWillChange = PassthroughSubject<Void, Never>()
-    
-    public private(set) var items: [AnyListItem] = [] {
-        didSet {
-            objectWillChange.send()
-        }
-    }
-    
-    public var listState: ListState = .items {
-        didSet {
-            objectWillChange.send()
-        }
-    }
+    @Published public private(set) var items: [AnyListItem] = []
+    @Published public var listState: ListState = .items
 
     public var supportedListActions: AdvancedListActions = .none
     public var excludeItem: (AnyListItem) -> Bool = { _ in false }

@@ -74,7 +74,7 @@ extension AdvancedList {
         }
     }
 
-    private func getListView() -> AnyView {
+    private func getListView() -> some View {
         switch listService.supportedListActions {
         case .delete(let onDelete):
             return AnyView(List {
@@ -128,7 +128,7 @@ extension AdvancedList {
         }
     }
     
-    private func getPaginationStateView() -> AnyView {
+    private func getPaginationStateView() -> some View {
         var paginationStateView = AnyView(EmptyView())
         
         switch pagination.state {

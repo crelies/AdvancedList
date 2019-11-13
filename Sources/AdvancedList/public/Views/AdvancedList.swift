@@ -9,7 +9,6 @@
 import ListPagination
 import SwiftUI
 
-#if !targetEnvironment(macCatalyst)
 public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View {
     @ObservedObject private var listService: ListService
     @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
@@ -26,27 +25,6 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
         self.pagination = pagination
     }
 }
-#else
-public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View {
-    private let emptyStateView: () -> EmptyStateView
-    private let errorStateView: (Error) -> ErrorStateView
-    private let loadingStateView: () -> LoadingStateView
-    @State private var isLastItem: Bool = false
-    
-    @EnvironmentObject var listService: ListService
-    /*
-        We have to erase the types of the pagination error and loading view
-        because currently there is no way to specify the types
-     */
-    @EnvironmentObject var pagination: AdvancedListPagination<AnyView, AnyView>
-    
-    public init(@ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.emptyStateView = emptyStateView
-        self.errorStateView = errorStateView
-        self.loadingStateView = loadingStateView
-    }
-}
-#endif
 
 extension AdvancedList {
     public var body: AnyView {
@@ -59,16 +37,7 @@ extension AdvancedList {
                 if !listService.items.isEmpty {
                     return AnyView(
                         VStack {
-                            List(listService.items) { item in
-                                item
-                                .onAppear {
-                                    self.listItemAppears(item)
-                                    
-                                    if self.listService.items.isLastItem(item) {
-                                        self.isLastItem = true
-                                    }
-                                }
-                            }
+                            getListView()
                             
                             if isLastItem {
                                 getPaginationStateView()
@@ -104,17 +73,71 @@ extension AdvancedList {
             case .noPagination: ()
         }
     }
+
+    private func getListView() -> some View {
+        switch listService.supportedListActions {
+        case .delete(let onDelete):
+            return AnyView(List {
+                ForEach(listService.items) { item in
+                    if !self.listService.excludeItem(item) {
+                        self.getItemView(item)
+                    }
+                }.onDelete { indexSet in
+                    onDelete(indexSet)
+                }
+            })
+        case .move(let onMove):
+            return AnyView(List {
+                ForEach(listService.items) { item in
+                    if !self.listService.excludeItem(item) {
+                        self.getItemView(item)
+                    }
+                }.onMove { (indexSet, index) in
+                    onMove(indexSet, index)
+                }
+            })
+        case .moveAndDelete(let onMove, let onDelete):
+            return AnyView(List {
+                ForEach(listService.items) { item in
+                    if !self.listService.excludeItem(item) {
+                        self.getItemView(item)
+                    }
+                }.onMove { (indexSet, index) in
+                    onMove(indexSet, index)
+                }.onDelete { indexSet in
+                    onDelete(indexSet)
+                }
+            })
+        case .none:
+            return AnyView(List(listService.items) { item in
+                if !self.listService.excludeItem(item) {
+                    self.getItemView(item)
+                }
+            })
+        }
+    }
+
+    private func getItemView(_ item: AnyListItem) -> some View {
+        item
+        .onAppear {
+            self.listItemAppears(item)
+
+            if self.listService.items.isLastItem(item) {
+                self.isLastItem = true
+            }
+        }
+    }
     
-    private func getPaginationStateView() -> AnyView {
+    private func getPaginationStateView() -> some View {
         var paginationStateView = AnyView(EmptyView())
         
         switch pagination.state {
-            case .error(let error):
-                paginationStateView = AnyView(pagination.errorView(error))
-            case .idle:
-                paginationStateView = AnyView(EmptyView())
-            case .loading:
-                paginationStateView = AnyView(pagination.loadingView())
+        case .error(let error):
+            paginationStateView = AnyView(pagination.errorView(error))
+        case .idle:
+            paginationStateView = AnyView(EmptyView())
+        case .loading:
+            paginationStateView = AnyView(pagination.loadingView())
         }
         
         return paginationStateView
@@ -124,31 +147,7 @@ extension AdvancedList {
 #if DEBUG
 struct AdvancedList_Previews : PreviewProvider {
     private static let listService = ListService()
-    
-    #if targetEnvironment(macCatalyst)
-    static var previews: some View {
-        NavigationView {
-            AdvancedList(emptyStateView: {
-                Text("No data")
-            }, errorStateView: { error in
-                VStack {
-                    Text(error.localizedDescription)
-                    .lineLimit(nil)
-                    
-                    Button(action: {
-                        // do something
-                    }) {
-                        Text("Retry")
-                    }
-                }
-            }, loadingStateView: {
-                Text("Loading ...")
-            })
-            .environmentObject(listService)
-            .environmentObject(AdvancedListPagination.noPagination)
-        }
-    }
-    #else
+
     static var previews: some View {
         NavigationView {
             AdvancedList(listService: listService, emptyStateView: {
@@ -156,7 +155,7 @@ struct AdvancedList_Previews : PreviewProvider {
             }, errorStateView: { error in
                 VStack {
                     Text(error.localizedDescription)
-                    .lineLimit(nil)
+                        .lineLimit(nil)
                     
                     Button(action: {
                         // do something
@@ -167,9 +166,7 @@ struct AdvancedList_Previews : PreviewProvider {
             }, loadingStateView: {
                 Text("Loading ...")
             }, pagination: .noPagination)
-//            .navigationBarTitle(Text("List of Items"))
         }
     }
-    #endif
 }
 #endif

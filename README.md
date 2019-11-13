@@ -88,7 +88,7 @@ private(set) lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
 ### 📁 Move and 🗑️ delete items
 
 You can define which actions your list should support through the `supportedListActions` property of your `ListService` instance.
-Choose between `delete`, `move`, `moveAndDelete` and `none`. The default is `none`.
+Choose between `delete`, `move`, `moveAndDelete` and `none`. **The default is `none`.**
 
 ```swift
 let listService = ListService()
@@ -101,7 +101,7 @@ listService.supportedListActions = .moveAndDelete(onMove: { indexSet, index in
 
 ### 🎛️ Filtering
 
-The `AdvancedList` supports filtering (disabled by default). You only have to set the closure `excludeItem: (AnyListItem) -> Bool)` on your `ListService` instance.
+The `AdvancedList` supports filtering (**disabled by default**). You only have to set the closure `excludeItem: (AnyListItem) -> Bool)` on your `ListService` instance.
 `AnyListItem` gives you access to the item (`Any`). **Keep in mind that you have to cast this item to your custom type!**
 
 ```swift

@@ -80,14 +80,7 @@ extension AdvancedList {
             return AnyView(List {
                 ForEach(listService.items) { item in
                     if !self.listService.excludeItem(item) {
-                        item
-                            .onAppear {
-                                self.listItemAppears(item)
-
-                                if self.listService.items.isLastItem(item) {
-                                    self.isLastItem = true
-                                }
-                            }
+                        self.getItemView(item)
                     }
                 }.onDelete { indexSet in
                     onDelete(indexSet)
@@ -97,14 +90,7 @@ extension AdvancedList {
             return AnyView(List {
                 ForEach(listService.items) { item in
                     if !self.listService.excludeItem(item) {
-                        item
-                            .onAppear {
-                                self.listItemAppears(item)
-
-                                if self.listService.items.isLastItem(item) {
-                                    self.isLastItem = true
-                                }
-                            }
+                        self.getItemView(item)
                     }
                 }.onMove { (indexSet, index) in
                     onMove(indexSet, index)
@@ -114,14 +100,7 @@ extension AdvancedList {
             return AnyView(List {
                 ForEach(listService.items) { item in
                     if !self.listService.excludeItem(item) {
-                        item
-                            .onAppear {
-                                self.listItemAppears(item)
-
-                                if self.listService.items.isLastItem(item) {
-                                    self.isLastItem = true
-                                }
-                            }
+                        self.getItemView(item)
                     }
                 }.onMove { (indexSet, index) in
                     onMove(indexSet, index)
@@ -132,16 +111,20 @@ extension AdvancedList {
         case .none:
             return AnyView(List(listService.items) { item in
                 if !self.listService.excludeItem(item) {
-                    item
-                        .onAppear {
-                            self.listItemAppears(item)
-
-                            if self.listService.items.isLastItem(item) {
-                                self.isLastItem = true
-                            }
-                        }
+                    self.getItemView(item)
                 }
             })
+        }
+    }
+
+    private func getItemView(_ item: AnyListItem) -> some View {
+        item
+        .onAppear {
+            self.listItemAppears(item)
+
+            if self.listService.items.isLastItem(item) {
+                self.isLastItem = true
+            }
         }
     }
     

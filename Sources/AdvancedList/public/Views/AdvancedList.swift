@@ -9,16 +9,24 @@
 import ListPagination
 import SwiftUI
 
-public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View {
-    @ObservedObject private var listService: ListService
+public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View where Data.Element: Identifiable {
     @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
+    private var data: Data
+    private var content: (Data.Element) -> Content
+    private var listState: Binding<ListState>
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
     @State private var isLastItem: Bool = false
-    
-    public init(listService: ListService, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
-        self.listService = listService
+    private let supportedListActions: AdvancedListActions
+    private var excludeItem: (Data.Element) -> Bool
+
+    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, supportedListActions: AdvancedListActions = .none, excludeItem: @escaping (Data.Element) -> Bool = { _ in false }, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
+        self.data = data
+        self.content = content
+        self.listState = listState
+        self.supportedListActions = supportedListActions
+        self.excludeItem = excludeItem
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
@@ -27,59 +35,37 @@ public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingSt
 }
 
 extension AdvancedList {
-    public var body: AnyView {
-        switch listService.listState {
-            case .error(let error):
+    public var body: some View {
+        switch listState.wrappedValue {
+        case .error(let error):
+            return AnyView(errorStateView(error))
+        case .items:
+            if !data.isEmpty {
                 return AnyView(
-                    errorStateView(error)
-                )
-            case .items:
-                if !listService.items.isEmpty {
-                    return AnyView(
-                        VStack {
-                            getListView()
-                            
-                            if isLastItem {
-                                getPaginationStateView()
-                            }
+                    VStack {
+                        getListView()
+
+                        if isLastItem {
+                            getPaginationStateView()
                         }
-                    )
-                } else {
-                    return AnyView(
-                        emptyStateView()
-                    )
-                }
-            case .loading:
-                return AnyView(
-                    loadingStateView()
+                    }
                 )
+            } else {
+                return AnyView(emptyStateView())
+            }
+        case .loading:
+            return AnyView(loadingStateView())
         }
     }
 }
 
 extension AdvancedList {
-    private func listItemAppears<Item: Identifiable>(_ item: Item) {
-        switch pagination.type {
-            case .lastItem:
-                if listService.items.isLastItem(item) {
-                    pagination.shouldLoadNextPage()
-                }
-            
-            case .thresholdItem(let offset):
-                if listService.items.isThresholdItem(offset: offset,
-                                                     item: item) {
-                    pagination.shouldLoadNextPage()
-                }
-            case .noPagination: ()
-        }
-    }
-
     private func getListView() -> some View {
-        switch listService.supportedListActions {
+        switch supportedListActions {
         case .delete(let onDelete):
             return AnyView(List {
-                ForEach(listService.items) { item in
-                    if !self.listService.excludeItem(item) {
+                ForEach(data) { item in
+                    if !self.excludeItem(item) {
                         self.getItemView(item)
                     }
                 }.onDelete { indexSet in
@@ -88,8 +74,8 @@ extension AdvancedList {
             })
         case .move(let onMove):
             return AnyView(List {
-                ForEach(listService.items) { item in
-                    if !self.listService.excludeItem(item) {
+                ForEach(data) { item in
+                    if !self.excludeItem(item) {
                         self.getItemView(item)
                     }
                 }.onMove { (indexSet, index) in
@@ -98,8 +84,8 @@ extension AdvancedList {
             })
         case .moveAndDelete(let onMove, let onDelete):
             return AnyView(List {
-                ForEach(listService.items) { item in
-                    if !self.listService.excludeItem(item) {
+                ForEach(data) { item in
+                    if !self.excludeItem(item) {
                         self.getItemView(item)
                     }
                 }.onMove { (indexSet, index) in
@@ -109,28 +95,44 @@ extension AdvancedList {
                 }
             })
         case .none:
-            return AnyView(List(listService.items) { item in
-                if !self.listService.excludeItem(item) {
+            return AnyView(List(data) { item in
+                if !self.excludeItem(item) {
                     self.getItemView(item)
                 }
             })
         }
     }
 
-    private func getItemView(_ item: AnyListItem) -> some View {
-        item
+    private func getItemView(_ item: Data.Element) -> some View {
+        content(item)
         .onAppear {
             self.listItemAppears(item)
 
-            if self.listService.items.isLastItem(item) {
+            if self.data.isLastItem(item) {
                 self.isLastItem = true
             }
         }
     }
-    
+
+    private func listItemAppears(_ item: Data.Element) {
+        switch pagination.type {
+        case .lastItem:
+            if data.isLastItem(item) {
+                pagination.shouldLoadNextPage()
+            }
+
+        case .thresholdItem(let offset):
+            if data.isThresholdItem(offset: offset,
+                                    item: item) {
+                pagination.shouldLoadNextPage()
+            }
+        case .noPagination: ()
+        }
+    }
+
     private func getPaginationStateView() -> some View {
         var paginationStateView = AnyView(EmptyView())
-        
+
         switch pagination.state {
         case .error(let error):
             paginationStateView = AnyView(pagination.errorView(error))
@@ -139,24 +141,27 @@ extension AdvancedList {
         case .loading:
             paginationStateView = AnyView(pagination.loadingView())
         }
-        
+
         return paginationStateView
     }
 }
 
 #if DEBUG
 struct AdvancedList_Previews : PreviewProvider {
-    private static let listService = ListService()
+    private static let items: [AnyListItem] = []
+    @State private static var listState: ListState = .items
 
     static var previews: some View {
         NavigationView {
-            AdvancedList(listService: listService, emptyStateView: {
+            AdvancedList(items, content: { element in
+                Text(element.id.description)
+            }, listState: $listState, emptyStateView: {
                 Text("No data")
             }, errorStateView: { error in
                 VStack {
                     Text(error.localizedDescription)
                         .lineLimit(nil)
-                    
+
                     Button(action: {
                         // do something
                     }) {

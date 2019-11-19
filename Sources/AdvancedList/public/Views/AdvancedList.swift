@@ -115,13 +115,13 @@ extension AdvancedList {
     }
 }
 
-extension UUID: Identifiable {
-    public var id: String { uuidString }
-}
-
 #if DEBUG
 struct AdvancedList_Previews : PreviewProvider {
-    private static let items: [UUID] = []
+    private struct MockItem: Identifiable {
+        let id: String = UUID().uuidString
+    }
+
+    private static let items: [MockItem] = []
     @State private static var listState: ListState = .items
 
     static var previews: some View {

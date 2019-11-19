@@ -85,7 +85,7 @@ private(set) lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
 ### 📁 Move and 🗑️ delete items
 
 You can define which actions your list should support through the `onMoveAction` and `onDeleteAction` initializer parameters.
-**Per default the move and delete function is disabled.**
+**Per default the move and delete functions are disabled if you skip the parameters.**
 
 ```swift
 import AdvancedList
@@ -148,9 +148,9 @@ For more examples take a look at [AdvancedList-SwiftUI](https://github.com/creli
 The `AdvancedList` was dramatically simplified and is now more like the `List` and `ForEach` SwiftUI views.
 
 1. Delete your list service instances and directly **pass your data to the list initializer**
-2. Create your views through a content block (initializer parameter) instead of conforming your items to `View` directly (removed type erased wrapper `AnyListItem`)
-3. Pass a list state binding to the initializer (before: the `ListService` managed the list state)
-4. Move and delete: Instead of setting `AdvancedListActions` on your list service just pass a `onMoveAction` and/or `onDeleteAction` block to the initializer
+2. Create your views through a content block (**initializer parameter**) instead of conforming your items to `View` directly (removed type erased wrapper `AnyListItem`)
+3. Pass a list state binding to the initializer (**before:** the `ListService` managed the list state)
+4. **Move and delete:** Instead of setting `AdvancedListActions` on your list service just pass a `onMoveAction` and/or `onDeleteAction` block to the initializer
 
 **Before:**
 ```swift

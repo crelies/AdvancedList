@@ -13,27 +13,28 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
 
+    private typealias Configuration = (AnyDynamicViewContent) -> AnyDynamicViewContent
+
     @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
     private var data: Data
     private var content: (Data.Element) -> Content
     private var listState: Binding<ListState>
-    private var onMoveAction: OnMoveAction = nil
-    private var onDeleteAction: OnDeleteAction = nil
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
     @State private var isLastItem: Bool = false
 
-    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, onMoveAction: OnMoveAction = nil, onDeleteAction: OnDeleteAction = nil, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
+    private var configurations: [Configuration]
+
+    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
         self.data = data
         self.content = content
         self.listState = listState
-        self.onMoveAction = onMoveAction
-        self.onDeleteAction = onDeleteAction
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
         self.pagination = pagination
+        configurations = []
     }
 }
 
@@ -62,13 +63,31 @@ extension AdvancedList {
     }
 }
 
+// MARK: - View modifiers
 extension AdvancedList {
+    public func onMove(perform action: OnMoveAction) -> Self {
+        configure { AnyDynamicViewContent($0.onMove(perform: action)) }
+    }
+
+    public func onDelete(perform action: OnDeleteAction) -> Self {
+        configure { AnyDynamicViewContent($0.onDelete(perform: action)) }
+    }
+}
+
+// MARK: - Private helper
+extension AdvancedList {
+    private func configure(_ configuration: @escaping Configuration) -> Self {
+        var result = self
+        result.configurations.append(configuration)
+        return result
+    }
+
     private func getListView() -> some View {
         List {
-            ForEach(data) { item in
-                self.getItemView(item)
-            }.onMove(perform: self.onMoveAction)
-            .onDelete(perform: self.onDeleteAction)
+            configurations
+                .reduce(AnyDynamicViewContent(ForEach(data) { item in
+                    self.getItemView(item)
+                })) { (currentView, configuration) in configuration(currentView) }
         }
     }
 
@@ -121,7 +140,7 @@ struct AdvancedList_Previews : PreviewProvider {
         let id: String = UUID().uuidString
     }
 
-    private static let items: [MockItem] = []
+    private static let items: [MockItem] = Array(0...5).map { _ in MockItem() }
     @State private static var listState: ListState = .items
 
     static var previews: some View {

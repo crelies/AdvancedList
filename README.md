@@ -12,15 +12,17 @@ Add this Swift package in Xcode using its Github repository url. (File > Swift P
 
 ## 🚀 How to use
 
-You control the view through an instance of `ListService`. The service manages the current state and the items of the list.
-Use it to append, update or remove items and to modify the state of the list. The `AdvancedList` view listens to the service and updates itself if needed.
+The `AdvancedList` view is similar to the `List` and `ForEach` views. You have to pass data (`RandomAccessCollection`) and a view provider (`(Data.Element) -> some View`) to the initializer. In addition to the `List` view the `AdvancedList` expects a list state and corresponding views.
+Modify your data anytime or hide an item through the content block if you like. The view is updated automatically 🎉.
 
 ```swift
 import AdvancedList
 
-let listService = ListService()
+@State private var listState: ListState = .items
 
-AdvancedList(listService: listService, emptyStateView: {
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     Text(error.localizedDescription)
@@ -28,11 +30,6 @@ AdvancedList(listService: listService, emptyStateView: {
 }, loadingStateView: {
     Text("Loading ...")
 }, pagination: .noPagination)
-
-listService.listState = .loading
-// TODO: fetch your items
-listService.appendItems(yourItems)
-listService.listState = .items
 ```
 
 ### 📄 Pagination
@@ -87,27 +84,33 @@ private(set) lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
 
 ### 📁 Move and 🗑️ delete items
 
-You can define which actions your list should support through the `supportedListActions` property of your `ListService` instance.
-Choose between `delete`, `move`, `moveAndDelete` and `none`. **The default is `none`.**
+You can define which actions your list should support through the `onMoveAction` and `onDeleteAction` initializer parameters.
+**Per default the move and delete functions are disabled if you skip the parameters.**
 
 ```swift
-let listService = ListService()
-listService.supportedListActions = .moveAndDelete(onMove: { indexSet, index in
-    // move me
-}, onDelete: { indexSet in
-    // please delete me
-})
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, onMoveAction: { (indexSet, index) in
+    // do something
+}, onDeleteAction: { indexSet in
+    // do something
+}, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    Text(error.localizedDescription)
+        .lineLimit(nil)
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
 ```
 
 ### 🎛️ Filtering
 
-The `AdvancedList` supports filtering (**disabled by default**). You only have to set the closure `excludeItem: (AnyListItem) -> Bool)` on your `ListService` instance.
-`AnyListItem` gives you access to the item (`Any`). **Keep in mind that you have to cast this item to your custom type!**
-
-```swift
-let listService = ListService()
-listService.excludeItem = { ($0.item as? YourItem).type == .xyz }
-```
+**You can hide items in your list through the content block.** Only return a view in the content block if a specific condition is met.
 
 ## 🎁 Example
 
@@ -116,11 +119,11 @@ The following code shows how easy-to-use the view is:
 ```swift
 import AdvancedList
 
-let listService = ListService()
-listService.appendItems(yourItems)
-listService.listState = .items
+@State private var listState: ListState = .items
 
-AdvancedList(listService: listService, emptyStateView: {
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     VStack {
@@ -139,3 +142,77 @@ AdvancedList(listService: listService, emptyStateView: {
 ```
 
 For more examples take a look at [AdvancedList-SwiftUI](https://github.com/crelies/AdvancedList-SwiftUI).
+
+## Migration 2.x -> 3.0
+
+The `AdvancedList` was dramatically simplified and is now more like the `List` and `ForEach` SwiftUI views.
+
+1. Delete your list service instances and directly **pass your data to the list initializer**
+2. Create your views through a content block (**initializer parameter**) instead of conforming your items to `View` directly (removed type erased wrapper `AnyListItem`)
+3. Pass a list state binding to the initializer (**before:** the `ListService` managed the list state)
+4. **Move and delete:** Instead of setting `AdvancedListActions` on your list service just pass a `onMoveAction` and/or `onDeleteAction` block to the initializer
+
+**Before:**
+```swift
+import AdvancedList
+
+let listService = ListService()
+listService.supportedListActions = .moveAndDelete(onMove: { (indexSet, index) in
+    // please move me
+}, onDelete: { indexSet in
+    // please delete me
+})
+listService.listState = .loading
+
+AdvancedList(listService: listService, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
+
+listService.listState = .loading
+// fetch your items ...
+listService.appendItems(yourItems)
+listService.listState = .items
+```
+
+**After:**
+```swift
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, onMoveAction: { (indexSet, index) in
+    // move me
+}, onDeleteAction: { indexSet in
+    // delete me
+}, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
+```

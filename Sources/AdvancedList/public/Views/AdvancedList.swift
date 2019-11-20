@@ -140,7 +140,7 @@ struct AdvancedList_Previews : PreviewProvider {
         let id: String = UUID().uuidString
     }
 
-    private static let items: [MockItem] = Array(0...5).map { MockItem() }
+    private static let items: [MockItem] = Array(0...5).map { _ in MockItem() }
     @State private static var listState: ListState = .items
 
     static var previews: some View {

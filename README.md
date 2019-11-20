@@ -85,8 +85,8 @@ private(set) lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
 
 ### 📁 Move and 🗑️ delete items
 
-You can define which actions your list should support through the `onMoveAction` and `onDeleteAction` initializer parameters.
-**Per default the move and delete functions are disabled if you skip the parameters.**
+To enable the move or delete function just use the related `onMove` or `onDelete` view modifier.
+**Per default the functions are disabled if you don't add the view modifiers.**
 
 ```swift
 import AdvancedList
@@ -95,11 +95,7 @@ import AdvancedList
 
 AdvancedList(yourData, content: { item in
     Text("Item")
-}, listState: $listState, onMoveAction: { (indexSet, index) in
-    // do something
-}, onDeleteAction: { indexSet in
-    // do something
-}, emptyStateView: {
+}, listState: $listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     Text(error.localizedDescription)
@@ -107,6 +103,12 @@ AdvancedList(yourData, content: { item in
 }, loadingStateView: {
     Text("Loading ...")
 }, pagination: .noPagination)
+.onMove { (indexSet, index) in
+    // move me
+}
+.onDelete { indexSet in
+    // delete me
+}
 ```
 
 ### 🎛️ Filtering
@@ -216,4 +218,70 @@ AdvancedList(yourData, content: { item in
 }, loadingStateView: {
     Text("Loading ...")
 }, pagination: .noPagination)
+```
+
+## Migration 3.0 -> 4.0
+
+Thanks to a hint from @SpectralDragon I could refactor the `onMove` and `onDelete` functionality to view modifiers.
+
+**Before:**
+```swift
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, onMoveAction: { (indexSet, index) in
+    // move me
+}, onDeleteAction: { indexSet in
+    // delete me
+}, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
+```
+
+**After:**
+```swift
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
+.onMove { (indexSet, index) in
+    // move me
+}
+.onDelete { indexSet in
+    // delete me
+}
 ```

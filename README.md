@@ -1,8 +1,10 @@
 # AdvancedList
 
-[![Swift5](https://img.shields.io/badge/swift5-compatible-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
+[![Swift 5](https://img.shields.io/badge/swift-5-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20tvOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com)
-[![Current Version](https://img.shields.io/github/v/tag/crelies/AdvancedList?longCache=true&style=flat-square)](https://github.com/crelies/AdvancedList)
+[![Current version](https://img.shields.io/github/v/tag/crelies/AdvancedList?longCache=true&style=flat-square)](https://github.com/crelies/AdvancedList)
+[![Build status](https://travis-ci.com/crelies/AdvancedList.svg?token=THnaziKxRFFz1nKcsPgz&branch=dev)](https://travis-ci.com/crelies/AdvancedList)
+[![Code coverage](https://codecov.io/gh/crelies/AdvancedList/branch/dev/graph/badge.svg?token=DhJyoUKNPM)](https://codecov.io/gh/crelies/AdvancedList)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg?longCache=true&style=flat-square)](https://en.wikipedia.org/wiki/MIT_License)
 
 This package provides a wrapper view around the **SwiftUI** `List view` which adds **pagination** (through my [ListPagination package](https://github.com/crelies/ListPagination)) and an **empty**, **error** and **loading state** including a corresponding view.

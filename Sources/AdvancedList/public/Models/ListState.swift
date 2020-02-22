@@ -14,6 +14,15 @@ public enum ListState {
     case loading
 }
 
+extension ListState {
+    var error: Error? {
+        guard case let ListState.error(error) = self else {
+            return nil
+        }
+        return error
+    }
+}
+
 extension ListState: Equatable {
     public static func ==(lhs: ListState, rhs: ListState) -> Bool {
         switch (lhs, rhs) {

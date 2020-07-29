@@ -1,5 +1,5 @@
 language: swift
-osx_image: xcode11.6
+osx_image: xcode12
 script:
   - swift package generate-xcodeproj
   - xcodebuild clean test -destination 'name=iPhone 8' -scheme AdvancedList-Package -enableCodeCoverage YES -derivedDataPath .build/derivedData -quiet

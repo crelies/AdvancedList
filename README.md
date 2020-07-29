@@ -1,6 +1,6 @@
 # AdvancedList
 
-[![Swift 5.2](https://img.shields.io/badge/swift-5.2-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
+[![Swift 5.3](https://img.shields.io/badge/swift-5.3-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20tvOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com)
 [![Current version](https://img.shields.io/github/v/tag/crelies/AdvancedList?longCache=true&style=flat-square)](https://github.com/crelies/AdvancedList)
 [![Build status](https://travis-ci.com/crelies/AdvancedList.svg?token=THnaziKxRFFz1nKcsPgz&branch=dev)](https://travis-ci.com/crelies/AdvancedList)

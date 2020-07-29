@@ -152,6 +152,7 @@ For more examples take a look at [AdvancedList-SwiftUI](https://github.com/creli
 
 <details>
 <summary>Migration 2.x -> 3.0</summary>
+
 The `AdvancedList` was dramatically simplified and is now more like the `List` and `ForEach` SwiftUI views.
 
 1. Delete your list service instances and directly **pass your data to the list initializer**
@@ -229,6 +230,7 @@ AdvancedList(yourData, content: { item in
 
 <details>
 <summary>Migration 3.0 -> 4.0</summary>
+
 Thanks to a hint from @SpectralDragon I could refactor the `onMove` and `onDelete` functionality to view modifiers.
 
 **Before:**

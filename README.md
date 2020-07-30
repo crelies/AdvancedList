@@ -1,6 +1,6 @@
 # AdvancedList
 
-[![Swift 5](https://img.shields.io/badge/swift-5-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
+[![Swift 5.3](https://img.shields.io/badge/swift-5.3-green.svg?longCache=true&style=flat-square)](https://developer.apple.com/swift)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20tvOS-lightgrey.svg?longCache=true&style=flat-square)](https://www.apple.com)
 [![Current version](https://img.shields.io/github/v/tag/crelies/AdvancedList?longCache=true&style=flat-square)](https://github.com/crelies/AdvancedList)
 [![Build status](https://travis-ci.com/crelies/AdvancedList.svg?token=THnaziKxRFFz1nKcsPgz&branch=dev)](https://travis-ci.com/crelies/AdvancedList)
@@ -148,7 +148,10 @@ AdvancedList(yourData, content: { item in
 
 For more examples take a look at [AdvancedList-SwiftUI](https://github.com/crelies/AdvancedList-SwiftUI).
 
-## Migration 2.x -> 3.0
+## Migration
+
+<details>
+<summary>Migration 2.x -> 3.0</summary>
 
 The `AdvancedList` was dramatically simplified and is now more like the `List` and `ForEach` SwiftUI views.
 
@@ -158,6 +161,7 @@ The `AdvancedList` was dramatically simplified and is now more like the `List` a
 4. **Move and delete:** Instead of setting `AdvancedListActions` on your list service just pass a `onMoveAction` and/or `onDeleteAction` block to the initializer
 
 **Before:**
+
 ```swift
 import AdvancedList
 
@@ -193,6 +197,7 @@ listService.listState = .items
 ```
 
 **After:**
+
 ```swift
 import AdvancedList
 
@@ -221,12 +226,15 @@ AdvancedList(yourData, content: { item in
     Text("Loading ...")
 }, pagination: .noPagination)
 ```
+</details>
 
-## Migration 3.0 -> 4.0
+<details>
+<summary>Migration 3.0 -> 4.0</summary>
 
 Thanks to a hint from @SpectralDragon I could refactor the `onMove` and `onDelete` functionality to view modifiers.
 
 **Before:**
+
 ```swift
 import AdvancedList
 
@@ -257,6 +265,7 @@ AdvancedList(yourData, content: { item in
 ```
 
 **After:**
+
 ```swift
 import AdvancedList
 
@@ -287,3 +296,4 @@ AdvancedList(yourData, content: { item in
     // delete me
 }
 ```
+</details>

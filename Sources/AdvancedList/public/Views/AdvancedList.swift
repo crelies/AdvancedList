@@ -41,7 +41,8 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
 extension AdvancedList {
     public var body: some View {
         Group {
-            if listState.wrappedValue == .items {
+            switch listState.wrappedValue {
+            case .items:
                 if !data.isEmpty {
                     VStack {
                         getListView()
@@ -53,12 +54,10 @@ extension AdvancedList {
                 } else {
                     emptyStateView()
                 }
-            } else if listState.wrappedValue == .loading {
+            case .loading:
                 loadingStateView()
-            } else {
-                listState.wrappedValue.error.map {
-                    errorStateView($0)
-                }
+            case let .error(error):
+                errorStateView(error)
             }
         }
     }

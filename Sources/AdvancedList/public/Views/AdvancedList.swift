@@ -9,13 +9,16 @@
 import ListPagination
 import SwiftUI
 
-public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View, PaginationErrorView: View, PaginationLoadingView: View> : View where Data.Element: Identifiable {
+/// An `advanced` container that presents rows of data arranged in a single column.
+/// Built-in `empty`, `error` and `loading` state.
+/// Supports `lastItem` or `thresholdItem` pagination.
+public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View where Data.Element: Identifiable {
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
 
     private typealias Configuration = (AnyDynamicViewContent) -> AnyDynamicViewContent
 
-    @ObservedObject private var pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>
+    private var pagination: AnyAdvancedListPagination?
     private var data: Data
     private var content: (Data.Element) -> Content
     private var listState: Binding<ListState>
@@ -26,51 +29,77 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
 
     private var configurations: [Configuration]
 
-    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView, pagination: AdvancedListPagination<PaginationErrorView, PaginationLoadingView>) {
+    /// Initializes the list with the given values.
+    ///
+    /// - Parameters:
+    ///   - data: The data for populating the list.
+    ///   - content: A view builder that creates the view for a single row of the list.
+    ///   - listState: A binding to a property that determines the state of the list.
+    ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
         self.data = data
         self.content = content
         self.listState = listState
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
-        self.pagination = pagination
         configurations = []
     }
 }
 
 extension AdvancedList {
-    public var body: some View {
-        Group {
-            switch listState.wrappedValue {
-            case .items:
-                if !data.isEmpty {
-                    VStack {
-                        getListView()
+    @ViewBuilder public var body: some View {
+        switch listState.wrappedValue {
+        case .items:
+            if !data.isEmpty {
+                VStack {
+                    getListView()
 
-                        if isLastItem {
-                            getPaginationStateView()
-                        }
+                    if let pagination = pagination, isLastItem {
+                        pagination.content()
                     }
-                } else {
-                    emptyStateView()
                 }
-            case .loading:
-                loadingStateView()
-            case let .error(error):
-                errorStateView(error)
+            } else {
+                emptyStateView()
             }
+        case .loading:
+            loadingStateView()
+        case let .error(error):
+            errorStateView(error)
         }
     }
 }
 
 // MARK: - View modifiers
 extension AdvancedList {
+    /// Sets the move action for the dynamic view.
+    ///
+    /// - Parameter action: A closure that SwiftUI invokes when elements in the dynamic view are moved. The closure takes two arguments that represent the offset relative to the dynamic view’s underlying collection of data.
+    /// - Returns: An `AdvancedList` view that calls action when elements are moved within the original view.
     public func onMove(perform action: OnMoveAction) -> Self {
         configure { AnyDynamicViewContent($0.onMove(perform: action)) }
     }
 
+    /// Sets the deletion action for the dynamic view.
+    ///
+    /// - Parameter action: The action that you want SwiftUI to perform when elements in the view are deleted. SwiftUI passes a set of indices to the closure that’s relative to the dynamic view’s underlying collection of data.
+    /// - Returns: An `AdvancedList` view that calls action when elements are deleted from the original view.
     public func onDelete(perform action: OnDeleteAction) -> Self {
         configure { AnyDynamicViewContent($0.onDelete(perform: action)) }
+    }
+
+    /// Adds pagination to the `AdvancedList`.
+    ///
+    /// - Parameter pagination: An `AdvancedListPagination` object specifying the pagination.
+    /// - Returns: An `AdvancedList` view that calls the `shouldLoadNextPage` closure of the specified `pagination` everytime when the end of a page was reached.
+    public func pagination<Content: View>(
+        _ pagination: AdvancedListPagination<Content>
+    ) -> Self {
+        var result = self
+        result.pagination = AnyAdvancedListPagination(pagination)
+        return result
     }
 }
 
@@ -86,7 +115,7 @@ extension AdvancedList {
         List {
             configurations
                 .reduce(AnyDynamicViewContent(ForEach(data) { item in
-                    self.getItemView(item)
+                    getItemView(item)
                 })) { (currentView, configuration) in configuration(currentView) }
         }
     }
@@ -94,43 +123,33 @@ extension AdvancedList {
     private func getItemView(_ item: Data.Element) -> some View {
         content(item)
         .onAppear {
-            self.listItemAppears(item)
+            listItemAppears(item)
 
-            if self.data.isLastItem(item) {
-                self.isLastItem = true
+            if data.isLastItem(item) {
+                isLastItem = true
             }
         }
     }
 
     private func listItemAppears(_ item: Data.Element) {
+        guard let pagination = pagination else {
+            return
+        }
+
         switch pagination.type {
         case .lastItem:
             if data.isLastItem(item) {
                 pagination.shouldLoadNextPage()
             }
 
-        case .thresholdItem(let offset):
-            if data.isThresholdItem(offset: offset,
-                                    item: item) {
+        case let .thresholdItem(offset):
+            if data.isThresholdItem(
+                offset: offset,
+                item: item
+            ) {
                 pagination.shouldLoadNextPage()
             }
-        case .noPagination: ()
         }
-    }
-
-    private func getPaginationStateView() -> some View {
-        var paginationStateView = AnyView(EmptyView())
-
-        switch pagination.state {
-        case .error(let error):
-            paginationStateView = AnyView(pagination.errorView(error))
-        case .idle:
-            paginationStateView = AnyView(EmptyView())
-        case .loading:
-            paginationStateView = AnyView(pagination.loadingView())
-        }
-
-        return paginationStateView
     }
 }
 
@@ -162,7 +181,7 @@ struct AdvancedList_Previews : PreviewProvider {
                 }
             }, loadingStateView: {
                 Text("Loading ...")
-            }, pagination: .noPagination)
+            })
         }
     }
 }

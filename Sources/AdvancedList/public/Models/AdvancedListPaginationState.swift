@@ -7,24 +7,12 @@
 
 import Foundation
 
-public enum AdvancedListPaginationState {
-    case error(_ error: Error)
+/// Represents the different states of a pagination.
+public enum AdvancedListPaginationState: Equatable {
+    /// The error state; use this state if an error occurs while loading a page.
+    case error(_ error: NSError)
+    /// The idle state; use this state if no page loading is in progress.
     case idle
+    /// The loading state; use this state if a page is loaded.
     case loading
-}
-
-extension AdvancedListPaginationState: Equatable {
-    public static func ==(lhs: AdvancedListPaginationState,
-                          rhs: AdvancedListPaginationState) -> Bool {
-        switch (lhs, rhs) {
-            case (.error(let lhsError), .error(let rhsError)):
-                return (lhsError as NSError) == (rhsError as NSError)
-            case (.idle, .idle):
-                return true
-            case (.loading, .loading):
-                return true
-            default:
-                return false
-        }
-    }
 }

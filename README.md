@@ -37,52 +37,39 @@ AdvancedList(yourData, content: { item in
 
 ### 📄 Pagination
 
-The `Pagination` is implemented as a class (conforming to `ObservableObject`) so the `AdvancedList` can observe it.
-It has three different states: `error`, `idle` and `loading`. If the `state` of the `Pagination` changes the `AdvancedList` updates itself to show or hide the state related view (`ErrorView` for state `.error(Error)` or `LoadingView` for state `.loading`, `.idle` will display nothing). Update the `state` if you start loading (`.loading`), stop loading ( `.idle`) or if an error occurred (`.error(Error)`) so the `AdvancedList` can render the appropriate view.
+The `Pagination` functionality is now (>= `5.0.0`) implemented as a `modifier`.
+It has three different states: `error`, `idle` and `loading`. If the `state` of the `Pagination` changes the `AdvancedList` displays the view created by the view builder of the specified pagination object (`AdvancedListPagination`). Keep track of the current pagination state by creating a local state variable (`@State`) of type `AdvancedListPaginationState`. Use this state variable in the `content` `ViewBuilder` of your pagination configuration object to determine which view should be displayed in the list (see the example below).
 
-If you want to use pagination you can choose between the `lastItemPagination` and the `thresholdItemPagination`. Both concepts are described [here](https://github.com/crelies/ListPagination). Just pass `.lastItemPagination` or `.thresholdItemPagination` including the required parameters to the `AdvancedList` initializer.
+If you want to use pagination you can choose between the `lastItemPagination` and the `thresholdItemPagination`. Both concepts are described [here](https://github.com/crelies/ListPagination). Just specify the type of the pagination when adding the `.pagination` modifier to your `AdvancedList`.
 
-Both pagination types require
-
-- an **ErrorView** and a **LoadingView** (**ViewBuilder**)
-- a block (**shouldLoadNextPage**) which is called if the `last or threshold item appeared` and
-- the initial state (**AdvancedListPaginationState**) of the pagination which determines the visibility of the pagination state related view.
-
-The `thresholdItemPagination` expects an offset parameter (number of items before the last item) to determine the threshold item.
-
-**The ErrorView or LoadingView will only be visible below the List if the last item of the List appeared! That way the user is only interrupted if needed.**
-
-**Skip pagination setup by using `.noPagination`.**
+**The view created by the `content` `ViewBuilder` of your pagination configuration object will only be visible below the List if the last item of the List appeared! That way the user is only interrupted if needed.**
 
 **Example:**
 
 ```swift
-private(set) lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
-    .thresholdItemPagination(errorView: { error in
-        AnyView(
-            VStack {
-                Text(error.localizedDescription)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.center)
-                
-                Button(action: {
-                    // load current page again
-                }) {
-                    Text("Retry")
-                }.padding()
-            }
-        )
-    }, loadingView: {
-        AnyView(
-            VStack {
-                Divider()
-                Text("Loading...")
-            }
-        )
-    }, offset: 25, shouldLoadNextPage: {
-        // load next page
-    }, state: .idle)
-}()
+@State private var paginationState: AdvancedListPaginationState = .idle
+
+AdvancedList(...)
+.pagination(.init(type: .lastItem, shouldLoadNextPage: {
+    paginationState = .loading
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        items.append(contentsOf: moreItems)
+        paginationState = .idle
+    }
+}) {
+    switch paginationState {
+    case .idle:
+        EmptyView()
+    case .loading:
+        if #available(iOS 14.0, *) {
+            ProgressView()
+        } else {
+            Text("Loading ...")
+        }
+    case let .error(error):
+        Text(error.localizedDescription)
+    }
+})
 ```
 
 ### 📁 Move and 🗑️ delete items
@@ -295,5 +282,110 @@ AdvancedList(yourData, content: { item in
 .onDelete { indexSet in
     // delete me
 }
+```
+</details>
+
+<details>
+<summary>Migration 4.0 -> 5.0</summary>
+
+`Pagination` is now implemented as a `modifier` 💪 And last but not least the code documentation arrived 😀
+
+**Before:**
+
+```swift
+private lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
+    .thresholdItemPagination(errorView: { error in
+        AnyView(
+            VStack {
+                Text(error.localizedDescription)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+
+                Button(action: {
+                    // load current page again
+                }) {
+                    Text("Retry")
+                }.padding()
+            }
+        )
+    }, loadingView: {
+        AnyView(
+            VStack {
+                Divider()
+                Text("Loading...")
+            }
+        )
+    }, offset: 25, shouldLoadNextPage: {
+        // load next page
+    }, state: .idle)
+}()
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: pagination)
+
+```
+
+**After:**
+
+```swift
+@State private var listState: ListState = .items
+@State private var paginationState: AdvancedListPaginationState = .idle
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+})
+.pagination(.init(type: .lastItem, shouldLoadNextPage: {
+    paginationState = .loading
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        items.append(contentsOf: moreItems)
+        paginationState = .idle
+    }
+}) {
+    switch paginationState {
+    case .idle:
+        EmptyView()
+    case .loading:
+        if #available(iOS 14.0, *) {
+            ProgressView()
+        } else {
+            Text("Loading ...")
+        }
+    case let .error(error):
+        Text(error.localizedDescription)
+    }
+})
 ```
 </details>

@@ -8,32 +8,12 @@
 
 import Foundation
 
-public enum ListState {
-    case error(_ error: Error)
+/// Specifies the different states of an `AdvancedList`.
+public enum ListState: Equatable {
+    /// The `error` state; displays the error view instead of the list to the user.
+    case error(_ error: NSError)
+    /// The `items` state (`default`); displays the items or the empty state view (if there are no items) to the user.
     case items
+    /// The `loading` state; displays the loading state view instead of the list to the user.
     case loading
-}
-
-extension ListState {
-    var error: Error? {
-        guard case let ListState.error(error) = self else {
-            return nil
-        }
-        return error
-    }
-}
-
-extension ListState: Equatable {
-    public static func ==(lhs: ListState, rhs: ListState) -> Bool {
-        switch (lhs, rhs) {
-            case (.error(let lhsError), .error(let rhsError)):
-                return (lhsError as NSError) == (rhsError as NSError)
-            case (.items, .items):
-                return true
-            case (.loading, .loading):
-                return true
-            default:
-                return false
-        }
-    }
 }

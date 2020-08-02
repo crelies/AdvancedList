@@ -22,16 +22,18 @@ final class AdvancedListTests: XCTestCase {
 
         let items: [String] = []
 
-        let view = AdvancedList(items, content: { item in Text(item) },
-                                listState: emptyListState,
-                                emptyStateView: { self.emptyStateView },
-                                errorStateView: { _ in self.errorStateView },
-                                loadingStateView: { self.loadingStateView },
-                                pagination: .noPagination)
+        let view = AdvancedList(
+            items, content: { item in Text(item) },
+            listState: emptyListState,
+            emptyStateView: { self.emptyStateView },
+            errorStateView: { _ in self.errorStateView },
+            loadingStateView: { self.loadingStateView }
+        )
 
         do {
             let inspectableView = try view.body.inspect()
-            let textString = try inspectableView.group().first?.text().string()
+            let text = try inspectableView.text()
+            let textString = try text.string()
             XCTAssertEqual(textString, emptyStateString)
         } catch {
             XCTFail("\(error)")
@@ -45,19 +47,19 @@ final class AdvancedListTests: XCTestCase {
         let mockItem2 = "MockItem2"
         let items: [String] = [mockItem1, mockItem2]
 
-        let view = AdvancedList(items, content: { item in Text(item) },
-                                listState: itemsListState,
-                                emptyStateView: { self.emptyStateView },
-                                errorStateView: { _ in self.errorStateView },
-                                loadingStateView: { self.loadingStateView },
-                                pagination: .noPagination)
+        let view = AdvancedList(
+            items, content: { item in Text(item) },
+            listState: itemsListState,
+            emptyStateView: { self.emptyStateView },
+            errorStateView: { _ in self.errorStateView },
+            loadingStateView: { self.loadingStateView }
+        )
 
         do {
             let inspectableView = try view.body.inspect()
-            let group = try inspectableView.group().first
-            let vStack = try group?.vStack()
-            let list = try vStack?.list(0)
-            let anyDynamicViewContent = try list?.first?.view(AnyDynamicViewContent.self)
+            let vStack = try inspectableView.vStack()
+            let list = try vStack.list(0)
+            let anyDynamicViewContent = try list.first?.view(AnyDynamicViewContent.self)
             let forEach = try anyDynamicViewContent?.anyView().forEach()
 
             let firstElement = forEach?.first
@@ -75,16 +77,18 @@ final class AdvancedListTests: XCTestCase {
 
         let items: [String] = []
 
-        let view = AdvancedList(items, content: { item in Text(item) },
-                                listState: loadingListState,
-                                emptyStateView: { self.emptyStateView },
-                                errorStateView: { _ in self.errorStateView },
-                                loadingStateView: { self.loadingStateView },
-                                pagination: .noPagination)
+        let view = AdvancedList(
+            items, content: { item in Text(item) },
+            listState: loadingListState,
+            emptyStateView: { self.emptyStateView },
+            errorStateView: { _ in self.errorStateView },
+            loadingStateView: { self.loadingStateView }
+        )
 
         do {
             let inspectableView = try view.body.inspect()
-            let textString = try inspectableView.group().first?.text().string()
+            let text = try inspectableView.text()
+            let textString = try text.string()
             XCTAssertEqual(textString, loadingStateString)
         } catch {
             XCTFail("\(error)")
@@ -97,16 +101,18 @@ final class AdvancedListTests: XCTestCase {
 
         let items: [String] = []
 
-        let view = AdvancedList(items, content: { item in Text(item) },
-                                listState: errorListState,
-                                emptyStateView: { self.emptyStateView },
-                                errorStateView: { _ in self.errorStateView },
-                                loadingStateView: { self.loadingStateView },
-                                pagination: .noPagination)
+        let view = AdvancedList(
+            items, content: { item in Text(item) },
+            listState: errorListState,
+            emptyStateView: { self.emptyStateView },
+            errorStateView: { _ in self.errorStateView },
+            loadingStateView: { self.loadingStateView }
+        )
 
         do {
             let inspectableView = try view.body.inspect()
-            let textString = try inspectableView.group().first?.text().string()
+            let text = try inspectableView.text()
+            let textString = try text.string()
             XCTAssertEqual(textString, errorStateString)
         } catch {
             XCTFail("\(error)")

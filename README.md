@@ -297,3 +297,108 @@ AdvancedList(yourData, content: { item in
 }
 ```
 </details>
+
+<details>
+<summary>Migration 4.0 -> 5.0</summary>
+
+`Pagination` is now implemented as a `modifier` 💪 And last but not least the code documentation arrived 😀
+
+**Before:**
+
+```swift
+private lazy var pagination: AdvancedListPagination<AnyView, AnyView> = {
+    .thresholdItemPagination(errorView: { error in
+        AnyView(
+            VStack {
+                Text(error.localizedDescription)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+
+                Button(action: {
+                    // load current page again
+                }) {
+                    Text("Retry")
+                }.padding()
+            }
+        )
+    }, loadingView: {
+        AnyView(
+            VStack {
+                Divider()
+                Text("Loading...")
+            }
+        )
+    }, offset: 25, shouldLoadNextPage: {
+        // load next page
+    }, state: .idle)
+}()
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: pagination)
+
+```
+
+**After:**
+
+```swift
+@State private var listState: ListState = .items
+@State private var paginationState: AdvancedListPaginationState = .idle
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+})
+.pagination(.init(type: .lastItem, shouldLoadNextPage: {
+    paginationState = .loading
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        items.append(contentsOf: moreItems)
+        paginationState = .idle
+    }
+}) {
+    switch paginationState {
+    case .idle:
+        EmptyView()
+    case .loading:
+        if #available(iOS 14.0, *) {
+            ProgressView()
+        } else {
+            Text("Loading ...")
+        }
+    case let .error(error):
+        Text(error.localizedDescription)
+    }
+})
+```
+</details>

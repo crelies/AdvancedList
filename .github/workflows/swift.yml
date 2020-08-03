@@ -1,0 +1,22 @@
+name: Swift
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Generate
+      run: swift package generate-xcodeproj
+    - name: Build
+      run: xcodebuild clean test -destination 'name=iPhone 8' -scheme AdvancedList-Package -enableCodeCoverage YES -derivedDataPath .build/derivedData -quiet
+    - name: Code coverage
+      run: bash <(curl -s https://codecov.io/bash) -J '^AdvancedList$' -D .build/derivedData

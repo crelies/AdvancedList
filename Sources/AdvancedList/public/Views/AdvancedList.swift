@@ -104,23 +104,40 @@ extension AdvancedList {
 }
 
 // MARK: - Private helper
-extension AdvancedList {
+private extension AdvancedList {
     private func configure(_ configuration: @escaping Configuration) -> Self {
         var result = self
         result.configurations.append(configuration)
         return result
     }
 
-    private func getListView() -> some View {
-        List {
-            configurations
-                .reduce(AnyDynamicViewContent(ForEach(data) { item in
-                    getItemView(item)
-                })) { (currentView, configuration) in configuration(currentView) }
+    @ViewBuilder func getListView() -> some View {
+        #if !os(tvOS)
+        if #available(iOS 14, macOS 11, *) {
+            ScrollView {
+                LazyVStack(alignment: .leading, content: rows)
+                .padding()
+            }
+        } else {
+            List(content: rows)
         }
+        #else
+        List(content: rows)
+        #endif
     }
 
-    private func getItemView(_ item: Data.Element) -> some View {
+    func rows() -> some View {
+        configurations
+            .reduce(
+                AnyDynamicViewContent(
+                    ForEach(data) { item in
+                        getItemView(item)
+                    }
+                )
+            ) { (currentView, configuration) in configuration(currentView) }
+    }
+
+    func getItemView(_ item: Data.Element) -> some View {
         content(item)
         .onAppear {
             listItemAppears(item)
@@ -131,7 +148,7 @@ extension AdvancedList {
         }
     }
 
-    private func listItemAppears(_ item: Data.Element) {
+    func listItemAppears(_ item: Data.Element) {
         guard let pagination = pagination else {
             return
         }

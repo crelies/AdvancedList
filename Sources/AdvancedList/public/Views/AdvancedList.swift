@@ -113,7 +113,7 @@ private extension AdvancedList {
 
     @ViewBuilder func getListView() -> some View {
         #if !os(tvOS)
-        if #available(iOS 14, macOS 11, *) {
+        if #available(iOS 14, macOS 11, macCatalyst 14, *) {
             ScrollView {
                 LazyVStack(alignment: .leading, content: rows)
                 .padding()

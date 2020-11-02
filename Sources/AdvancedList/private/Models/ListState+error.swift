@@ -1,6 +1,6 @@
 //
 //  ListState+error.swift
-//  
+//  AdvancedList
 //
 //  Created by Christian Elies on 02.08.20.
 //

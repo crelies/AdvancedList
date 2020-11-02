@@ -1,6 +1,6 @@
 //
 //  AdvancedListPaginationState.swift
-//  
+//  AdvancedList
 //
 //  Created by Christian Elies on 17.08.19.
 //

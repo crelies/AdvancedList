@@ -43,14 +43,14 @@ Upgrade from version `5.0.0` **without breaking anything**. Simply add the **lis
 
 ```swift
 AdvancedList(yourData, listView: { rows in
-		if #available(iOS 14, macOS 11, *) {
-			ScrollView {
-				LazyVStack(alignment: .leading, content: rows)
-					.padding()
-			}
-		} else {
-			List(content: rows)
-		}
+    if #available(iOS 14, macOS 11, *) {
+        ScrollView {
+            LazyVStack(alignment: .leading, content: rows)
+                .padding()
+        }
+    } else {
+        List(content: rows)
+    }
 }, content: { item in
     Text("Item")
 }, listState: $listState, emptyStateView: {

@@ -32,7 +32,35 @@ AdvancedList(yourData, content: { item in
         .lineLimit(nil)
 }, loadingStateView: {
     Text("Loading ...")
-}, pagination: .noPagination)
+})
+```
+
+### 🆕 Custom List view
+
+Starting from version `6.0.0` you can use a custom list view instead of the `SwiftUI` `List` used under the hood. As an example you can now easily use the **LazyVStack** introduced in **iOS 14** if needed.
+
+Upgrade from version `5.0.0` **without breaking anything**. Simply add the **listView parameter** after the upgrade:
+
+```swift
+AdvancedList(yourData, listView: { rows in
+    if #available(iOS 14, macOS 11, *) {
+        ScrollView {
+            LazyVStack(alignment: .leading, content: rows)
+                .padding()
+        }
+    } else {
+        List(content: rows)
+    }
+}, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    Text(error.localizedDescription)
+        .lineLimit(nil)
+}, loadingStateView: {
+    Text("Loading ...")
+})
 ```
 
 ### 📄 Pagination
@@ -91,7 +119,7 @@ AdvancedList(yourData, content: { item in
         .lineLimit(nil)
 }, loadingStateView: {
     Text("Loading ...")
-}, pagination: .noPagination)
+})
 .onMove { (indexSet, index) in
     // move me
 }
@@ -130,7 +158,7 @@ AdvancedList(yourData, content: { item in
     }
 }, loadingStateView: {
     Text("Loading ...")
-}, pagination: .noPagination)
+})
 ```
 
 For more examples take a look at [AdvancedList-SwiftUI](https://github.com/crelies/AdvancedList-SwiftUI).

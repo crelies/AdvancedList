@@ -12,7 +12,8 @@ import SwiftUI
 /// An `advanced` container that presents rows of data arranged in a single column.
 /// Built-in `empty`, `error` and `loading` state.
 /// Supports `lastItem` or `thresholdItem` pagination.
-public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View where Data.Element: Identifiable {
+public struct AdvancedList<Data: RandomAccessCollection, ListView: View, Content: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View where Data.Element: Identifiable {
+    public typealias Rows = () -> AnyDynamicViewContent
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
 
@@ -20,6 +21,7 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
 
     private var pagination: AnyAdvancedListPagination?
     private var data: Data
+    private var listView: ((Rows) -> ListView)?
     private var content: (Data.Element) -> Content
     private var listState: Binding<ListState>
     private let emptyStateView: () -> EmptyStateView
@@ -30,6 +32,30 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
     private var configurations: [Configuration]
 
     /// Initializes the list with the given values.
+    ///
+    /// - Parameters:
+    ///   - data: The data for populating the list.
+    ///   - listView: A view builder that creates a custom list view from the given type erased dynamic view content representing the rows of the list.
+    ///   - content: A view builder that creates the view for a single row of the list.
+    ///   - listState: A binding to a property that determines the state of the list.
+    ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.data = data
+        self.listView = listView
+        self.content = content
+        self.listState = listState
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        configurations = []
+    }
+}
+
+extension AdvancedList where ListView == List<Never, AnyDynamicViewContent> {
+    /// Initializes the list with the given values.
+    /// Uses the native `SwiftUI` `List` as list view.
     ///
     /// - Parameters:
     ///   - data: The data for populating the list.
@@ -46,6 +72,7 @@ public struct AdvancedList<Data: RandomAccessCollection, Content: View, EmptySta
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
         configurations = []
+        listView = getListView
     }
 }
 
@@ -55,7 +82,9 @@ extension AdvancedList {
         case .items:
             if !data.isEmpty {
                 VStack {
-                    getListView()
+                    if let listView = listView {
+                        listView(rows)
+                    }
 
                     if let pagination = pagination, isLastItem {
                         pagination.content()
@@ -104,23 +133,29 @@ extension AdvancedList {
 }
 
 // MARK: - Private helper
-extension AdvancedList {
+private extension AdvancedList {
     private func configure(_ configuration: @escaping Configuration) -> Self {
         var result = self
         result.configurations.append(configuration)
         return result
     }
 
-    private func getListView() -> some View {
-        List {
-            configurations
-                .reduce(AnyDynamicViewContent(ForEach(data) { item in
-                    getItemView(item)
-                })) { (currentView, configuration) in configuration(currentView) }
-        }
+    func getListView(rows: Rows) -> List<Never, AnyDynamicViewContent> {
+        List(content: rows)
     }
 
-    private func getItemView(_ item: Data.Element) -> some View {
+    func rows() -> AnyDynamicViewContent {
+        configurations
+            .reduce(
+                AnyDynamicViewContent(
+                    ForEach(data) { item in
+                        getItemView(item)
+                    }
+                )
+            ) { (currentView, configuration) in configuration(currentView) }
+    }
+
+    func getItemView(_ item: Data.Element) -> some View {
         content(item)
         .onAppear {
             listItemAppears(item)
@@ -131,7 +166,7 @@ extension AdvancedList {
         }
     }
 
-    private func listItemAppears(_ item: Data.Element) {
+    func listItemAppears(_ item: Data.Element) {
         guard let pagination = pagination else {
             return
         }

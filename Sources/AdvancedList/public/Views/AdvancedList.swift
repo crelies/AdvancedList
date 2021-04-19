@@ -23,7 +23,7 @@ public struct AdvancedList<Data: RandomAccessCollection, ListView: View, Content
     private var data: Data
     private var listView: ((Rows) -> ListView)?
     private var content: (Data.Element) -> Content
-    private var listState: Binding<ListState>
+    private let listState: ListState
     private let emptyStateView: () -> EmptyStateView
     private let errorStateView: (Error) -> ErrorStateView
     private let loadingStateView: () -> LoadingStateView
@@ -37,11 +37,11 @@ public struct AdvancedList<Data: RandomAccessCollection, ListView: View, Content
     ///   - data: The data for populating the list.
     ///   - listView: A view builder that creates a custom list view from the given type erased dynamic view content representing the rows of the list.
     ///   - content: A view builder that creates the view for a single row of the list.
-    ///   - listState: A binding to a property that determines the state of the list.
+    ///   - listState: A value representing the state of the list.
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+    public init(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
         self.data = data
         self.listView = listView
         self.content = content
@@ -60,11 +60,11 @@ extension AdvancedList where ListView == List<Never, AnyDynamicViewContent> {
     /// - Parameters:
     ///   - data: The data for populating the list.
     ///   - content: A view builder that creates the view for a single row of the list.
-    ///   - listState: A binding to a property that determines the state of the list.
+    ///   - listState: A value representing the state of the list.
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: Binding<ListState>, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+    public init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
         self.data = data
         self.content = content
         self.listState = listState
@@ -78,7 +78,7 @@ extension AdvancedList where ListView == List<Never, AnyDynamicViewContent> {
 
 extension AdvancedList {
     @ViewBuilder public var body: some View {
-        switch listState.wrappedValue {
+        switch listState {
         case .items:
             if !data.isEmpty {
                 VStack {
@@ -201,7 +201,7 @@ struct AdvancedList_Previews : PreviewProvider {
         NavigationView {
             AdvancedList(items, content: { element in
                 Text(element.id)
-            }, listState: $listState, emptyStateView: {
+            }, listState: listState, emptyStateView: {
                 Text("No data")
             }, errorStateView: { error in
                 VStack {

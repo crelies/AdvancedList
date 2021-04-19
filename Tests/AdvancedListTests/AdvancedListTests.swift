@@ -18,7 +18,7 @@ final class AdvancedListTests: XCTestCase {
     private lazy var loadingStateView = Text(loadingStateString)
 
     func testEmptyStateView() {
-        let emptyListState: Binding<ListState> = .constant(.items)
+        let emptyListState: ListState = .items
 
         let items: [String] = []
 
@@ -41,7 +41,7 @@ final class AdvancedListTests: XCTestCase {
     }
 
     func testNotEmptyStateView() {
-        let itemsListState: Binding<ListState> = .constant(.items)
+        let itemsListState: ListState = .items
 
         let mockItem1 = "MockItem1"
         let mockItem2 = "MockItem2"
@@ -73,7 +73,7 @@ final class AdvancedListTests: XCTestCase {
     }
 
     func testLoadingStateView() {
-        let loadingListState: Binding<ListState> = .constant(.loading)
+        let loadingListState: ListState = .loading
 
         let items: [String] = []
 
@@ -97,7 +97,7 @@ final class AdvancedListTests: XCTestCase {
 
     func testErrorStateView() {
         let error = NSError(domain: "MockDomain", code: 1, userInfo: nil)
-        let errorListState: Binding<ListState> = .constant(.error(error))
+        let errorListState: ListState = .error(error)
 
         let items: [String] = []
 

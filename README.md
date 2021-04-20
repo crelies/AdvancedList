@@ -25,7 +25,7 @@ import AdvancedList
 
 AdvancedList(yourData, content: { item in
     Text("Item")
-}, listState: $listState, emptyStateView: {
+}, listState: listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     Text(error.localizedDescription)
@@ -53,7 +53,7 @@ AdvancedList(yourData, listView: { rows in
     }
 }, content: { item in
     Text("Item")
-}, listState: $listState, emptyStateView: {
+}, listState: listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     Text(error.localizedDescription)
@@ -112,7 +112,7 @@ import AdvancedList
 
 AdvancedList(yourData, content: { item in
     Text("Item")
-}, listState: $listState, emptyStateView: {
+}, listState: listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     Text(error.localizedDescription)
@@ -143,7 +143,7 @@ import AdvancedList
 
 AdvancedList(yourData, content: { item in
     Text("Item")
-}, listState: $listState, emptyStateView: {
+}, listState: listState, emptyStateView: {
     Text("No data")
 }, errorStateView: { error in
     VStack {
@@ -415,5 +415,65 @@ AdvancedList(yourData, content: { item in
         Text(error.localizedDescription)
     }
 })
+```
+</details>
+
+<details>
+<summary>Migration 6.0 -> 7.0</summary>
+
+I replaced the unnecessary listState `Binding` and replaced it with a simple value parameter.
+
+**Before:**
+
+```swift
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: $listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
+```
+
+**After:**
+
+```swift
+import AdvancedList
+
+@State private var listState: ListState = .items
+
+AdvancedList(yourData, content: { item in
+    Text("Item")
+}, listState: listState, emptyStateView: {
+    Text("No data")
+}, errorStateView: { error in
+    VStack {
+        Text(error.localizedDescription)
+            .lineLimit(nil)
+        
+        Button(action: {
+            // do something
+        }) {
+            Text("Retry")
+        }
+    }
+}, loadingStateView: {
+    Text("Loading ...")
+}, pagination: .noPagination)
 ```
 </details>

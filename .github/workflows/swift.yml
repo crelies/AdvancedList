@@ -2,21 +2,20 @@ name: Swift
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch:
 
 jobs:
   build:
-
+    name: Test and upload coverage data
     runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Generate
+    - name: Generate Xcode project
       run: swift package generate-xcodeproj
-    - name: Build
+    - name: Test
       run: xcodebuild clean test -destination 'name=iPhone 8' -scheme AdvancedList-Package -enableCodeCoverage YES -derivedDataPath .build/derivedData -quiet
-    - name: Code coverage
+    - name: Upload Test coverage data
       run: bash <(curl -s https://codecov.io/bash) -J '^AdvancedList$' -D .build/derivedData

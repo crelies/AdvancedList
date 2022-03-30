@@ -45,10 +45,9 @@ extension AdvancedList {
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Data: RandomAccessCollection, ListView: View, RowContent: View>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
-
+    public init<Data: RandomAccessCollection, ListView: View, RowContent: View>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
         let listView = { AnyView(listView($0)) }
-        self.type = .init(type: AdvancedListType.data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
+        self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
 
         self.listState = listState
         self.emptyStateView = emptyStateView
@@ -67,10 +66,9 @@ extension AdvancedList {
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Data: RandomAccessCollection, RowContent: View>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
-
+    public init<Data: RandomAccessCollection, RowContent: View>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
         let listView = { AnyView(List<Never, AnyDynamicViewContent>(content: $0)) }
-        self.type = .init(type: AdvancedListType.data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
+        self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
 
         self.listState = listState
         self.emptyStateView = emptyStateView
@@ -228,7 +226,7 @@ private extension AdvancedList {
 
 #if DEBUG
 struct AdvancedList_Previews : PreviewProvider {
-    private struct MockItem: Identifiable, Hashable {
+    private struct MockItem: Identifiable {
         let id: String = UUID().uuidString
     }
 

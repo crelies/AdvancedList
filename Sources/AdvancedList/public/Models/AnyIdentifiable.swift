@@ -1,9 +1,14 @@
-public struct AnyIdentifiable: Identifiable, Hashable {
+/// A type-erased `Identifiable` value.
+public struct AnyIdentifiable: Identifiable {
     public let id: AnyHashable
-    public let value: AnyHashable
+    /// The value conforming to the `Identifiable` protocol.
+    public let value: Any
 
-    public init<T: Identifiable>(_ identifiable: T) where T: Hashable {
-        self.id = AnyHashable(identifiable.id)
-        self.value = identifiable
+    /// Initializes the type-erased `Identifiable` value.
+    ///
+    /// - Parameter identifiable: A value conforming to the `Identifiable` protocol.
+    public init<T: Identifiable>(_ identifiable: T) {
+        id = AnyHashable(identifiable.id)
+        value = identifiable
     }
 }

@@ -8,7 +8,7 @@ enum AdvancedListType<Element> {
 struct AnyAdvancedListType {
     let value: AdvancedListType<AnyIdentifiable>
 
-    init<Element: Hashable>(type: AdvancedListType<Element>) where Element: Identifiable {
+    init<Element: Identifiable>(type: AdvancedListType<Element>) {
         switch type {
         case let .data(data, listView, rowContent):
             self.value = .data(

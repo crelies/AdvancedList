@@ -89,7 +89,7 @@ AdvancedList(...)
     case .idle:
         EmptyView()
     case .loading:
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             ProgressView()
         } else {
             Text("Loading ...")
@@ -406,7 +406,7 @@ AdvancedList(yourData, content: { item in
     case .idle:
         EmptyView()
     case .loading:
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             ProgressView()
         } else {
             Text("Loading ...")

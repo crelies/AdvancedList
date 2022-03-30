@@ -8,9 +8,9 @@
 
 struct AnyIdentifiable: Identifiable {
     let id: AnyHashable
-    let value: Any
+    let value: AnyHashable
 
-    init<T: Identifiable>(_ identifiable: T) {
+    init<T: Identifiable>(_ identifiable: T) where T: Hashable {
         self.id = AnyHashable(identifiable.id)
         self.value = identifiable
     }

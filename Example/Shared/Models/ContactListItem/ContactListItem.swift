@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ContactListItem: Identifiable {
+struct ContactListItem: Identifiable, Hashable {
     let id: String
     let firstName: String
     let lastName: String

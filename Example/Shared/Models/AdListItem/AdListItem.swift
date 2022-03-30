@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct AdListItem: Identifiable {
+struct AdListItem: Identifiable, Hashable {
     let id: String
     let text: String
 

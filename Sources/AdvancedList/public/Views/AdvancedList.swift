@@ -12,7 +12,7 @@ import SwiftUI
 /// An `advanced` container that presents rows of data arranged in a single column.
 /// Built-in `empty`, `error` and `loading` state.
 /// Supports `lastItem` or `thresholdItem` pagination.
-public struct AdvancedList<RowContent: View, EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View {
+public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View {
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
 
@@ -45,7 +45,7 @@ extension AdvancedList {
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<ListView: View, Data: RandomAccessCollection>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
+    public init<Data: RandomAccessCollection, ListView: View, RowContent: View>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
 
         let listView = { AnyView(listView($0)) }
         self.type = .init(type: AdvancedListType.data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
@@ -67,7 +67,7 @@ extension AdvancedList {
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Data: RandomAccessCollection>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
+    public init<Data: RandomAccessCollection, RowContent: View>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable, Data.Element: Hashable {
 
         let listView = { AnyView(List<Never, AnyDynamicViewContent>(content: $0)) }
         self.type = .init(type: AdvancedListType.data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
@@ -85,7 +85,7 @@ extension AdvancedList {
 @available(tvOS 15, *)
 extension AdvancedList {
     public init<Content: View>(listState: ListState, @ViewBuilder content: @escaping () -> Content, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(content()) }))
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(content: content)) }))
         self.listState = listState
         self.emptyStateView = emptyStateView
         self.errorStateView = errorStateView

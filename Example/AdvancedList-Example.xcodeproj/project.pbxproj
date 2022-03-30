@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B9B5A11B27F4EF74002FD9A0 /* ContentExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B5A11A27F4EF74002FD9A0 /* ContentExampleView.swift */; };
+		B9B5A11C27F4EF74002FD9A0 /* ContentExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B5A11A27F4EF74002FD9A0 /* ContentExampleView.swift */; };
 		B9BFF1DC24D777BD005C9C21 /* AdvancedListExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9BFF1CA24D777BC005C9C21 /* AdvancedListExampleApp.swift */; };
 		B9BFF1DD24D777BD005C9C21 /* AdvancedListExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9BFF1CA24D777BC005C9C21 /* AdvancedListExampleApp.swift */; };
 		B9BFF1E024D777BD005C9C21 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9BFF1CC24D777BD005C9C21 /* Assets.xcassets */; };
 		B9BFF1E124D777BD005C9C21 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9BFF1CC24D777BD005C9C21 /* Assets.xcassets */; };
 		B9BFF1E924D7788B005C9C21 /* ExampleDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAD564622D75C4500FB141B /* ExampleDataProvider.swift */; };
 		B9BFF1EA24D7788B005C9C21 /* ExampleDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAD564622D75C4500FB141B /* ExampleDataProvider.swift */; };
-		B9BFF1EB24D778A2005C9C21 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D9DFEB22CA8CDC00051FE2 /* ContentView.swift */; };
-		B9BFF1EC24D778A2005C9C21 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D9DFEB22CA8CDC00051FE2 /* ContentView.swift */; };
+		B9BFF1EB24D778A2005C9C21 /* DataExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D9DFEB22CA8CDC00051FE2 /* DataExampleView.swift */; };
+		B9BFF1EC24D778A2005C9C21 /* DataExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D9DFEB22CA8CDC00051FE2 /* DataExampleView.swift */; };
 		B9BFF1EF24D778CD005C9C21 /* ExampleError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9884A4A22D3C99000063925 /* ExampleError.swift */; };
 		B9BFF1F024D778CD005C9C21 /* ExampleError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9884A4A22D3C99000063925 /* ExampleError.swift */; };
 		B9BFF1F124D778D1005C9C21 /* AdListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9DA7AA423A2D8E4003C615B /* AdListItemView.swift */; };
@@ -46,6 +48,7 @@
 		B9884A4E22DA153900063925 /* ContactDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailView.swift; sourceTree = "<group>"; };
 		B9884A5022DA167E00063925 /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
 		B99D5FA127A70FDB000F3688 /* AdvancedList */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AdvancedList; path = ..; sourceTree = "<group>"; };
+		B9B5A11A27F4EF74002FD9A0 /* ContentExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentExampleView.swift; sourceTree = "<group>"; };
 		B9B7E17623049FD60018BD33 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		B9BFF1CA24D777BC005C9C21 /* AdvancedListExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedListExampleApp.swift; sourceTree = "<group>"; };
 		B9BFF1CC24D777BD005C9C21 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -54,7 +57,7 @@
 		B9BFF1D824D777BD005C9C21 /* AdvancedListExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdvancedListExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9BFF1DA24D777BD005C9C21 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9BFF1DB24D777BD005C9C21 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
-		B9D9DFEB22CA8CDC00051FE2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B9D9DFEB22CA8CDC00051FE2 /* DataExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExampleView.swift; sourceTree = "<group>"; };
 		B9D9E00B22CA8E5C00051FE2 /* ContactListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactListItem.swift; sourceTree = "<group>"; };
 		B9D9E01222CA971D00051FE2 /* AdvancedList.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AdvancedList.gif; sourceTree = SOURCE_ROOT; };
 		B9DA7AA223A2D7F9003C615B /* ContactListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactListItemView.swift; sourceTree = "<group>"; };
@@ -159,8 +162,9 @@
 		B9D9E00A22CA8E4800051FE2 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B9D9DFEB22CA8CDC00051FE2 /* ContentView.swift */,
+				B9B5A11A27F4EF74002FD9A0 /* ContentExampleView.swift */,
 				CEAD564822D7C26300FB141B /* CustomListStateSegmentedControlView.swift */,
+				B9D9DFEB22CA8CDC00051FE2 /* DataExampleView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -305,7 +309,8 @@
 				B9BFF1F224D778D1005C9C21 /* AdListItem.swift in Sources */,
 				B9BFF1E924D7788B005C9C21 /* ExampleDataProvider.swift in Sources */,
 				B9BFF1F124D778D1005C9C21 /* AdListItemView.swift in Sources */,
-				B9BFF1EB24D778A2005C9C21 /* ContentView.swift in Sources */,
+				B9BFF1EB24D778A2005C9C21 /* DataExampleView.swift in Sources */,
+				B9B5A11B27F4EF74002FD9A0 /* ContentExampleView.swift in Sources */,
 				B9BFF20324D778DA005C9C21 /* CustomListStateSegmentedControlView.swift in Sources */,
 				B9BFF1FD24D778D5005C9C21 /* ContactListItemView.swift in Sources */,
 				B9BFF1FC24D778D5005C9C21 /* ContactListItem.swift in Sources */,
@@ -326,7 +331,8 @@
 				B9BFF1F624D778D1005C9C21 /* AdListItem.swift in Sources */,
 				B9BFF1EA24D7788B005C9C21 /* ExampleDataProvider.swift in Sources */,
 				B9BFF1F524D778D1005C9C21 /* AdListItemView.swift in Sources */,
-				B9BFF1EC24D778A2005C9C21 /* ContentView.swift in Sources */,
+				B9BFF1EC24D778A2005C9C21 /* DataExampleView.swift in Sources */,
+				B9B5A11C27F4EF74002FD9A0 /* ContentExampleView.swift in Sources */,
 				B9BFF20424D778DA005C9C21 /* CustomListStateSegmentedControlView.swift in Sources */,
 				B9BFF20224D778D5005C9C21 /* ContactListItemView.swift in Sources */,
 				B9BFF20124D778D5005C9C21 /* ContactListItem.swift in Sources */,

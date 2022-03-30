@@ -11,7 +11,7 @@ import SwiftUI
 public struct AnyDynamicViewContent: DynamicViewContent {
     private let view: AnyView
 
-    public private(set) var data: AnyCollection<Any>
+    public let data: AnyCollection<Any>
 
     public var body: some View { view }
 

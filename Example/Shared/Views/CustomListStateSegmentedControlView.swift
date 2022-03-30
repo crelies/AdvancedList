@@ -10,36 +10,36 @@ import AdvancedList
 import SwiftUI
 
 struct CustomListStateSegmentedControlView : View {
-    let listState: Binding<ListState>
-    let items: Binding<[AnyIdentifiable]>
-    
+    @Binding var listState: ListState
+    @Binding var items: [AnyIdentifiable]
+
     var body: some View {
         HStack {
             Button(action: {
-                self.listState.wrappedValue = .items
-                
+                self.listState = .items
+
                 let items = ExampleDataProvider.randomItems()
-                self.items.wrappedValue.removeAll()
-                self.items.wrappedValue.append(contentsOf: items)
+                self.items.removeAll()
+                self.items.append(contentsOf: items)
             }) {
                 Text("Items")
             }
-            
+
             Button(action: {
-                self.items.wrappedValue.removeAll()
-                self.listState.wrappedValue = .items
+                self.items.removeAll()
+                self.listState = .items
             }) {
                 Text("Empty")
             }
-            
+
             Button(action: {
-                self.listState.wrappedValue = .loading
+                self.listState = .loading
             }) {
                 Text("Loading")
             }
-            
+
             Button(action: {
-                self.listState.wrappedValue = .error(ExampleError.allCases.randomElement()! as NSError)
+                self.listState = .error(ExampleError.allCases.randomElement()! as NSError)
             }) {
                 Text("Error")
             }

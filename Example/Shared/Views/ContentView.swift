@@ -32,92 +32,93 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            GeometryReader { geometry in
-                VStack {
-                    CustomListStateSegmentedControlView(
-                        listState: $listState,
-                        items: $items
-                    )
-                    
-                    let advancedList = AdvancedList(items, content: { item in
-                        view(for: item)
-                    }, listState: listState, emptyStateView: {
-                        Text("No data")
-                    }, errorStateView: { error in
-                        Text("\(error.localizedDescription)").lineLimit(nil)
-                    }, loadingStateView: {
-                        if #available(iOS 14, *) {
-                            ProgressView()
-                        } else {
-                            Text("Loading ...")
-                        }
-                    })
-                    .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
-                        switch paginationState {
-                        case .idle:
-                            EmptyView()
-                        case .loading:
-                            HStack {
-                                Spacer()
+            VStack {
+                CustomListStateSegmentedControlView(
+                    listState: $listState,
+                    items: $items
+                )
 
-                                if #available(iOS 14, *) {
-                                    ProgressView()
-                                } else {
-                                    Text("Loading ...")
-                                }
-
-                                Spacer()
-                            }
-                            .padding()
-                            .background(backgroundColor)
-                            .cornerRadius(16)
-                            .padding(.horizontal)
-
-                        case let .error(error):
-                            HStack {
-                                Spacer()
-                                VStack(spacing: 8) {
-                                    Text(error.localizedDescription)
-                                        .foregroundColor(.red)
-                                        .lineLimit(nil)
-                                        .multilineTextAlignment(.center)
-
-                                    Button(action: {
-                                        loadNextItems()
-                                    }) {
-                                        Text("Retry")
-                                    }
-                                }
-                                Spacer()
-                            }
-                            .padding()
-                            .background(backgroundColor)
-                            .cornerRadius(16)
-                            .padding(.horizontal)
-                        }
-                    })
-
-                    if #available(iOS 15, macOS 12, tvOS 15, *) {
-                        advancedList
-                        .refreshable {
-                            let duration = UInt64(3 * 1_000_000_000)
-                            try? await Task<Never, Never>.sleep(nanoseconds: duration)
-
-                            Task(priority: .userInitiated) {
-                                listState = .items
-
-                                let items = ExampleDataProvider.randomItems()
-                                self.items.removeAll()
-                                self.items.append(contentsOf: items)
-                            }
-                        }
-                        .frame(width: geometry.size.width)
+                let advancedList = AdvancedList(items, content: { item in
+                    view(for: item)
+                }, listState: listState, emptyStateView: {
+                    Text("No data")
+                }, errorStateView: { error in
+                    Text("\(error.localizedDescription)").lineLimit(nil)
+                }, loadingStateView: {
+                    if #available(iOS 14, *) {
+                        ProgressView()
                     } else {
-                        advancedList.frame(width: geometry.size.width)
+                        Text("Loading ...")
                     }
+                })
+                .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
+                    switch paginationState {
+                    case .idle:
+                        EmptyView()
+                    case .loading:
+                        HStack {
+                            Spacer()
+
+                            if #available(iOS 14, *) {
+                                ProgressView()
+                            } else {
+                                Text("Loading ...")
+                            }
+
+                            Spacer()
+                        }
+                        .padding()
+                        .background(backgroundColor)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+
+                    case let .error(error):
+                        HStack {
+                            Spacer()
+                            VStack(spacing: 8) {
+                                Text(error.localizedDescription)
+                                    .foregroundColor(.red)
+                                    .lineLimit(nil)
+                                    .multilineTextAlignment(.center)
+
+                                Button(action: {
+                                    loadNextItems()
+                                }) {
+                                    Text("Retry")
+                                }
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                        .background(backgroundColor)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+                    }
+                })
+
+                if #available(iOS 15, macOS 12, tvOS 15, *) {
+                    advancedList
+                    .refreshable {
+                        paginationState = .idle
+
+                        let duration = UInt64(1.5 * 1_000_000_000)
+                        try? await Task<Never, Never>.sleep(nanoseconds: duration)
+
+                        Task(priority: .userInitiated) {
+                            listState = .items
+
+                            let items = ExampleDataProvider.randomItems()
+                            self.items.removeAll()
+                            self.items.append(contentsOf: items)
+                        }
+                    }
+                } else {
+                    advancedList
                 }
-                .navigationTitle(Text("List of Items"))
+
+                Spacer()
             }
+            .navigationTitle(Text("List of Items"))
         }.navigationViewStyle(navigationStyle)
     }
 }

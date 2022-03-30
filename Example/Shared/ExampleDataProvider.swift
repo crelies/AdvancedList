@@ -21,21 +21,25 @@ final class ExampleDataProvider {
                 let zip = "20097"
                 let city = "Hamburg"
                 let viewRepresentationType = ContactListItemViewRepresentationType.allCases.randomElement()!
-                let itemModel = ContactListItem(id: id,
-                                                firstName: firstName,
-                                                lastName: lastName,
-                                                streetAddress: streetAddress,
-                                                zip: zip,
-                                                city: city,
-                                                viewRepresentationType: viewRepresentationType)
+                let itemModel = ContactListItem(
+                    id: id,
+                    firstName: firstName,
+                    lastName: lastName,
+                    streetAddress: streetAddress,
+                    zip: zip,
+                    city: city,
+                    viewRepresentationType: viewRepresentationType
+                )
                 return AnyIdentifiable(itemModel)
             } else {
                 let id = UUID().uuidString
                 let text = "⚠️ This is a really long and annoying advertisement I want to get rid off. Everyone knows that it's hard to hide from ads. They always find us ☢️!"
                 let viewRepresentationType = AdListItemViewRepresentationType.allCases.randomElement()!
-                let itemModel = AdListItem(id: id,
-                                           text: text,
-                                           viewRepresentationType: viewRepresentationType)
+                let itemModel = AdListItem(
+                    id: id,
+                    text: text,
+                    viewRepresentationType: viewRepresentationType
+                )
                 return AnyIdentifiable(itemModel)
             }
         }

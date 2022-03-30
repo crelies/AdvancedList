@@ -176,7 +176,7 @@ private extension AdvancedList {
                 .reduce(
                     AnyDynamicViewContent(
                         ForEach(data) { item in
-                            getItemView(item)
+                            itemView(item)
                         }
                     )
                 ) { (currentView, configuration) in configuration(currentView) }
@@ -186,7 +186,7 @@ private extension AdvancedList {
     }
 
     @ViewBuilder
-    func getItemView(_ item: AnyIdentifiable) -> some View {
+    func itemView(_ item: AnyIdentifiable) -> some View {
         switch type.value {
         case let .data(_, _, rowContent):
             rowContent(item)

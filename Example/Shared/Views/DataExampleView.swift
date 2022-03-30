@@ -93,10 +93,10 @@ struct DataExampleView: View {
                 .refreshable {
                     listState = .loading
 
-                    let duration = UInt64(1.5 * 1_000_000_000)
-                    try? await Task<Never, Never>.sleep(nanoseconds: duration)
-
                     Task(priority: .userInitiated) {
+                        let duration = UInt64(1.5 * 1_000_000_000)
+                        try? await Task<Never, Never>.sleep(nanoseconds: duration)
+
                         let items = ExampleDataProvider.randomItems()
                         self.items.removeAll()
                         self.items.append(contentsOf: items)

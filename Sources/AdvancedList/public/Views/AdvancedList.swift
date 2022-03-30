@@ -81,11 +81,19 @@ extension AdvancedList {
 @available(iOS 15, *)
 @available(macOS 12, *)
 @available(tvOS 15, *)
-extension AdvancedList {
-    public init<Content: View>(listState: ListState, @ViewBuilder content: @escaping () -> Content, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+extension AdvancedList where EmptyStateView == EmptyView {
+    /// Initializes the list with the given content.
+    /// Uses the native `SwiftUI` `List` as list view.
+    ///
+    /// - Parameters:
+    ///   - listState: A value representing the state of the list.
+    ///   - content: A view builder that creates the content of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init<Content: View>(listState: ListState, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
         self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(content: content)) }))
         self.listState = listState
-        self.emptyStateView = emptyStateView
+        self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView
         self.loadingStateView = loadingStateView
         configurations = []

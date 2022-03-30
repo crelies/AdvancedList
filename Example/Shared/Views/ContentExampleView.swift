@@ -16,8 +16,6 @@ struct ContentExampleView: View {
                 Text("Example 1")
                 Text("Example 2")
                 Text("Example 3")
-            } emptyStateView: {
-                Text("Empty")
             } errorStateView: { error in
                 VStack(alignment: .leading) {
                     Text("Error").foregroundColor(.primary)

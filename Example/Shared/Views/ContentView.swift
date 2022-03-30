@@ -125,10 +125,14 @@ struct ContentView: View {
 
 private extension ContentView {
     @ViewBuilder func view(for identifiable: AnyIdentifiable) -> some View {
-        if let contactListItem = identifiable.value as? ContactListItem {
-            ContactListItemView(contactListItem: contactListItem)
-        } else if let adListItem = identifiable.value as? AdListItem {
-            AdListItemView(adListItem: adListItem)
+        if let value = identifiable.value as? AnyIdentifiable {
+            if let contactListItem = value.value as? ContactListItem {
+                ContactListItemView(contactListItem: contactListItem)
+            } else if let adListItem = value.value as? AdListItem {
+                AdListItemView(adListItem: adListItem)
+            } else {
+                EmptyView()
+            }
         } else {
             EmptyView()
         }

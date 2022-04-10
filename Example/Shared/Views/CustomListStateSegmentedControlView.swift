@@ -10,36 +10,45 @@ import AdvancedList
 import SwiftUI
 
 struct CustomListStateSegmentedControlView : View {
-    @Binding var listState: ListState
     @Binding var items: [AnyIdentifiable]
+    @Binding var listState: ListState
+    @Binding var paginationState: AdvancedListPaginationState
+    var shouldHideEmptyOption = false
 
     var body: some View {
         HStack {
             Button(action: {
-                self.listState = .items
-
                 let items = ExampleDataProvider.randomItems()
                 self.items.removeAll()
                 self.items.append(contentsOf: items)
+
+                listState = .items
+                paginationState = .idle
             }) {
                 Text("Items")
             }
 
-            Button(action: {
-                self.items.removeAll()
-                self.listState = .items
-            }) {
-                Text("Empty")
+            if !shouldHideEmptyOption {
+                Button(action: {
+                    items.removeAll()
+
+                    listState = .items
+                    paginationState = .idle
+                }) {
+                    Text("Empty")
+                }
             }
 
             Button(action: {
-                self.listState = .loading
+                listState = .loading
+                paginationState = .idle
             }) {
                 Text("Loading")
             }
 
             Button(action: {
-                self.listState = .error(ExampleError.allCases.randomElement()! as NSError)
+                listState = .error(ExampleError.allCases.randomElement()! as NSError)
+                paginationState = .idle
             }) {
                 Text("Error")
             }

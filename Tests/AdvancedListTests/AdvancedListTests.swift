@@ -58,14 +58,14 @@ final class AdvancedListTests: XCTestCase {
         do {
             let inspectableView = try view.body.inspect()
             let vStack = try inspectableView.vStack()
-            let list = try vStack.list(0)
+            let list = try vStack.anyView(0).list()
             let anyDynamicViewContent = try list.first?.view(AnyDynamicViewContent.self)
             let forEach = try anyDynamicViewContent?.anyView().forEach()
 
-            let firstElement = forEach?.first
+            let firstElement = try forEach?.first?.anyView()
             XCTAssertEqual(try firstElement?.text().string(), mockItem1)
 
-            let secondElement = forEach?[1]
+            let secondElement = try forEach?[1].anyView()
             XCTAssertEqual(try secondElement?.text().string(), mockItem2)
         } catch {
             XCTFail("\(error)")

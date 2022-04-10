@@ -10,18 +10,30 @@ import AdvancedList
 import SwiftUI
 
 struct ContentExampleView: View {
+    @State private var listState: ListState = .items
+
     var body: some View {
-        AdvancedList(listState: .items) {
-            Text("Example 1")
-            Text("Example 2")
-            Text("Example 3")
-        } errorStateView: { error in
-            VStack(alignment: .leading) {
-                Text("Error").foregroundColor(.primary)
-                Text(error.localizedDescription).foregroundColor(.secondary)
+        VStack(spacing: 16) {
+            CustomListStateSegmentedControlView(
+                items: .constant([]),
+                listState: $listState,
+                paginationState: .constant(.idle)
+            )
+
+            AdvancedList(listState: listState) {
+                Text("Example 1")
+                Text("Example 2")
+                Text("Example 3")
+            } errorStateView: { error in
+                VStack(alignment: .leading) {
+                    Text("Error").foregroundColor(.primary)
+                    Text(error.localizedDescription).foregroundColor(.secondary)
+                }
+            } loadingStateView: {
+                ProgressView()
             }
-        } loadingStateView: {
-            ProgressView()
+
+            Spacer()
         }
         .navigationTitle("Content example")
     }

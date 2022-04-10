@@ -23,81 +23,14 @@ struct DataExampleView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             CustomListStateSegmentedControlView(
                 items: $items,
                 listState: $listState,
                 paginationState: $paginationState
             )
 
-            let advancedList = AdvancedList(items, content: { item in
-                view(for: item)
-            }, listState: listState, emptyStateView: {
-                Text("No data")
-            }, errorStateView: { error in
-                Text("\(error.localizedDescription)").lineLimit(nil)
-            }, loadingStateView: {
-                ProgressView()
-            })
-            .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
-                switch paginationState {
-                case .idle:
-                    EmptyView()
-                case .loading:
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                        Spacer()
-                    }
-                    .padding()
-                    .background(backgroundColor)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-
-                case let .error(error):
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Text(error.localizedDescription)
-                                .foregroundColor(.red)
-                                .lineLimit(nil)
-                                .multilineTextAlignment(.center)
-
-                            Button(action: {
-                                loadNextItems()
-                            }) {
-                                Text("Retry")
-                            }
-                        }
-                        Spacer()
-                    }
-                    .padding()
-                    .background(backgroundColor)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                }
-            })
-
-            if #available(tvOS 15, *) {
-                advancedList
-                .refreshable {
-                    listState = .loading
-
-                    Task(priority: .userInitiated) {
-                        let duration = UInt64(1.5 * 1_000_000_000)
-                        try? await Task<Never, Never>.sleep(nanoseconds: duration)
-
-                        let items = ExampleDataProvider.randomItems()
-                        self.items.removeAll()
-                        self.items.append(contentsOf: items)
-
-                        listState = .items
-                        paginationState = .idle
-                    }
-                }
-            } else {
-                advancedList
-            }
+            list()
 
             Spacer()
         }
@@ -106,15 +39,95 @@ struct DataExampleView: View {
 }
 
 private extension DataExampleView {
-    @ViewBuilder func view(for identifiable: AnyIdentifiable) -> some View {
-        if let value = identifiable.value as? AnyIdentifiable {
-            if let contactListItem = value.value as? ContactListItem {
-                ContactListItemView(contactListItem: contactListItem)
-            } else if let adListItem = value.value as? AdListItem {
-                AdListItemView(adListItem: adListItem)
-            } else {
+    @ViewBuilder
+    func list() -> some View {
+        let advancedList = AdvancedList(items, content: { item in
+            view(for: item)
+        }, listState: listState, emptyStateView: {
+            Text("No data")
+        }, errorStateView: { error in
+            Text("\(error.localizedDescription)").lineLimit(nil)
+        }, loadingStateView: {
+            ProgressView()
+        })
+        .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
+            switch paginationState {
+            case .idle:
                 EmptyView()
+            case .loading:
+                paginationLoadingStateView()
+            case let .error(error):
+                paginationErrorStateView(error)
             }
+        })
+
+        if #available(tvOS 15, *) {
+            advancedList
+            .refreshable(action: refresh)
+        } else {
+            advancedList
+        }
+    }
+
+    func paginationLoadingStateView() -> some View {
+        HStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+        }
+        .padding()
+        .background(backgroundColor)
+        .cornerRadius(16)
+        .padding(.horizontal)
+    }
+
+    func paginationErrorStateView(_ error: Error) -> some View {
+        HStack {
+            Spacer()
+            VStack(spacing: 8) {
+                Text(error.localizedDescription)
+                    .foregroundColor(.red)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+
+                Button(action: {
+                    loadNextItems()
+                }) {
+                    Text("Retry")
+                }
+            }
+            Spacer()
+        }
+        .padding()
+        .background(backgroundColor)
+        .cornerRadius(16)
+        .padding(.horizontal)
+    }
+
+    @Sendable
+    func refresh() async {
+        listState = .loading
+
+        Task(priority: .userInitiated) {
+            let duration = UInt64(1.5 * 1_000_000_000)
+            try? await Task<Never, Never>.sleep(nanoseconds: duration)
+
+            let items = ExampleDataProvider.randomItems()
+            self.items.removeAll()
+            self.items.append(contentsOf: items)
+
+            listState = .items
+            paginationState = .idle
+        }
+    }
+}
+
+private extension DataExampleView {
+    @ViewBuilder func view(for identifiable: AnyIdentifiable) -> some View {
+        if let contactListItem = identifiable.value as? ContactListItem {
+            ContactListItemView(contactListItem: contactListItem)
+        } else if let adListItem = identifiable.value as? AdListItem {
+            AdListItemView(adListItem: adListItem)
         } else {
             EmptyView()
         }

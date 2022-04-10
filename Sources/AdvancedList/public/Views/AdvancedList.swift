@@ -13,8 +13,12 @@ import SwiftUI
 /// Built-in `empty`, `error` and `loading` state.
 /// Supports `lastItem` or `thresholdItem` pagination.
 public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View>: View {
+    // MARK: - Public
+
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
+
+    // MARK: - Private
 
     private typealias Configuration = (AnyDynamicViewContent) -> AnyDynamicViewContent
 
@@ -77,6 +81,50 @@ extension AdvancedList {
         self.loadingStateView = loadingStateView
         configurations = []
     }
+
+    /// Initializes the list with the given values that supports selecting a single row.
+    /// Uses the native `SwiftUI` `List` as list view.
+    ///
+    /// - Parameters:
+    ///   - data: The data for populating the list.
+    ///   - rowContent: A view builder that creates the view for a single row of the list.
+    ///   - listState: A value representing the state of the list, defaults to `items`.
+    ///   - selection: A binding to a selected value.
+    ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init<Data: RandomAccessCollection, SelectionValue: Hashable, RowContent: View>(_ data: Data, @ViewBuilder rowContent: @escaping (Data.Element) -> RowContent, listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
+        let listView = { AnyView(List<SelectionValue, AnyDynamicViewContent>(selection: selection, content: $0)) }
+        self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(rowContent($0)) }))
+
+        self.listState = listState
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        configurations = []
+    }
+
+    /// Initializes the list with the given values that supports selecting multiple rows.
+    /// Uses the native `SwiftUI` `List` as list view.
+    ///
+    /// - Parameters:
+    ///   - data: The data for populating the list.
+    ///   - rowContent: A view builder that creates the view for a single row of the list.
+    ///   - listState: A value representing the state of the list, defaults to `items`.
+    ///   - selection: A binding to a set that identifies selected rows.
+    ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init<Data: RandomAccessCollection, SelectionValue: Hashable, RowContent: View>(_ data: Data, @ViewBuilder rowContent: @escaping (Data.Element) -> RowContent, listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
+        let listView = { AnyView(List<SelectionValue, AnyDynamicViewContent>(selection: selection, content: $0)) }
+        self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(rowContent($0)) }))
+
+        self.listState = listState
+        self.emptyStateView = emptyStateView
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        configurations = []
+    }
 }
 
 // MARK: - Content initializers
@@ -124,11 +172,11 @@ extension AdvancedList where EmptyStateView == EmptyView {
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a selected value.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView
@@ -142,11 +190,11 @@ extension AdvancedList where EmptyStateView == EmptyView {
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a set that identifies selected rows.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView
@@ -196,10 +244,10 @@ extension AdvancedList where EmptyStateView == EmptyView, ErrorStateView == Empt
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a selected value.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = { _ in ErrorStateView() }
@@ -213,10 +261,10 @@ extension AdvancedList where EmptyStateView == EmptyView, ErrorStateView == Empt
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a set that identifies selected rows.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = { _ in ErrorStateView() }
@@ -266,10 +314,10 @@ extension AdvancedList where EmptyStateView == EmptyView, LoadingStateView == Em
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a selected value.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView
@@ -283,10 +331,10 @@ extension AdvancedList where EmptyStateView == EmptyView, LoadingStateView == Em
     /// - Parameters:
     ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - selection: A binding to a set that identifies selected rows.
-    ///   - content: A view builder that creates the content of the list.
+    ///   - listContent: A view builder that creates the content of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
-    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView) {
-        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+    public init<ListContent: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder listContent: @escaping () -> ListContent, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: listContent)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView

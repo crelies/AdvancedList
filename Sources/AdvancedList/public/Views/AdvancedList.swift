@@ -329,6 +329,8 @@ extension AdvancedList {
 extension AdvancedList {
     /// Sets the move action for the dynamic view.
     ///
+    /// `Attention`: Works only if you initialize an `AdvancedList` with a `RandomAccessCollection`.
+    ///
     /// - Parameter action: A closure that SwiftUI invokes when elements in the dynamic view are moved. The closure takes two arguments that represent the offset relative to the dynamic view’s underlying collection of data.
     /// - Returns: An `AdvancedList` view that calls action when elements are moved within the original view.
     public func onMove(perform action: OnMoveAction) -> Self {
@@ -337,6 +339,8 @@ extension AdvancedList {
 
     /// Sets the deletion action for the dynamic view.
     ///
+    /// `Attention`: Works only if you initialize an `AdvancedList` with a `RandomAccessCollection`.
+    ///
     /// - Parameter action: The action that you want SwiftUI to perform when elements in the view are deleted. SwiftUI passes a set of indices to the closure that’s relative to the dynamic view’s underlying collection of data.
     /// - Returns: An `AdvancedList` view that calls action when elements are deleted from the original view.
     public func onDelete(perform action: OnDeleteAction) -> Self {
@@ -344,6 +348,8 @@ extension AdvancedList {
     }
 
     /// Adds pagination to the `AdvancedList`.
+    ///
+    /// `Attention`: Works only if you initialize an `AdvancedList` with a `RandomAccessCollection`.
     ///
     /// - Parameter pagination: An `AdvancedListPagination` object specifying the pagination.
     /// - Returns: An `AdvancedList` view that calls the `shouldLoadNextPage` closure of the specified `pagination` everytime when the end of a page was reached.

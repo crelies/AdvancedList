@@ -37,11 +37,7 @@ struct DataExampleView: View {
             }, errorStateView: { error in
                 Text("\(error.localizedDescription)").lineLimit(nil)
             }, loadingStateView: {
-                if #available(iOS 14, *) {
-                    ProgressView()
-                } else {
-                    Text("Loading ...")
-                }
+                ProgressView()
             })
             .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
                 switch paginationState {
@@ -50,13 +46,7 @@ struct DataExampleView: View {
                 case .loading:
                     HStack {
                         Spacer()
-
-                        if #available(iOS 14, *) {
-                            ProgressView()
-                        } else {
-                            Text("Loading ...")
-                        }
-
+                        ProgressView()
                         Spacer()
                     }
                     .padding()
@@ -88,7 +78,7 @@ struct DataExampleView: View {
                 }
             })
 
-            if #available(iOS 15, macOS 12, tvOS 15, *) {
+            if #available(tvOS 15, *) {
                 advancedList
                 .refreshable {
                     listState = .loading

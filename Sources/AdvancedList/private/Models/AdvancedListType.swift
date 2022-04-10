@@ -14,7 +14,7 @@ struct AnyAdvancedListType {
             self.value = .data(
                 data: AnyRandomAccessCollection(data.map(AnyIdentifiable.init)),
                 listView: listView,
-                rowContent: { rowContent($0 as! Element) }
+                rowContent: { rowContent($0.value as! Element) }
             )
         case let .container(content):
             self.value = .container(content: content)

@@ -11,21 +11,19 @@ import SwiftUI
 
 struct ContentExampleView: View {
     var body: some View {
-        if #available(iOS 15, *) {
-            AdvancedList(listState: .items) {
-                Text("Example 1")
-                Text("Example 2")
-                Text("Example 3")
-            } errorStateView: { error in
-                VStack(alignment: .leading) {
-                    Text("Error").foregroundColor(.primary)
-                    Text(error.localizedDescription).foregroundColor(.secondary)
-                }
-            } loadingStateView: {
-                ProgressView()
+        AdvancedList(listState: .items) {
+            Text("Example 1")
+            Text("Example 2")
+            Text("Example 3")
+        } errorStateView: { error in
+            VStack(alignment: .leading) {
+                Text("Error").foregroundColor(.primary)
+                Text(error.localizedDescription).foregroundColor(.secondary)
             }
-            .navigationTitle("Content example")
+        } loadingStateView: {
+            ProgressView()
         }
+        .navigationTitle("Content example")
     }
 }
 

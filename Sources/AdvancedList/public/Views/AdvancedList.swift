@@ -12,7 +12,7 @@ import SwiftUI
 /// An `advanced` container that presents rows of data arranged in a single column.
 /// Built-in `empty`, `error` and `loading` state.
 /// Supports `lastItem` or `thresholdItem` pagination.
-public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View> : View {
+public struct AdvancedList<EmptyStateView: View, ErrorStateView: View, LoadingStateView: View>: View {
     public typealias OnMoveAction = Optional<(IndexSet, Int) -> Void>
     public typealias OnDeleteAction = Optional<(IndexSet) -> Void>
 
@@ -41,11 +41,11 @@ extension AdvancedList {
     ///   - data: The data for populating the list.
     ///   - listView: A view builder that creates a custom list view from the given type erased dynamic view content representing the rows of the list.
     ///   - content: A view builder that creates the view for a single row of the list.
-    ///   - listState: A value representing the state of the list.
+    ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Data: RandomAccessCollection, ListView: View, RowContent: View>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
+    public init<Data: RandomAccessCollection, ListView: View, RowContent: View>(_ data: Data, @ViewBuilder listView: @escaping (Rows) -> ListView, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState = .items, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
         let listView = { AnyView(listView($0)) }
         self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
 
@@ -62,11 +62,11 @@ extension AdvancedList {
     /// - Parameters:
     ///   - data: The data for populating the list.
     ///   - content: A view builder that creates the view for a single row of the list.
-    ///   - listState: A value representing the state of the list.
+    ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - emptyStateView: A view builder that creates the view for the empty state of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Data: RandomAccessCollection, RowContent: View>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
+    public init<Data: RandomAccessCollection, RowContent: View>(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> RowContent, listState: ListState = .items, @ViewBuilder emptyStateView: @escaping () -> EmptyStateView, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) where Data.Element: Identifiable {
         let listView = { AnyView(List<Never, AnyDynamicViewContent>(content: $0)) }
         self.type = .init(type: .data(data: AnyRandomAccessCollection(data), listView: listView, rowContent: { AnyView(content($0)) }))
 
@@ -86,12 +86,48 @@ extension AdvancedList where EmptyStateView == EmptyView {
     /// Uses the native `SwiftUI` `List` as list view.
     ///
     /// - Parameters:
-    ///   - listState: A value representing the state of the list.
+    ///   - listState: A value representing the state of the list, defaults to `items`.
     ///   - content: A view builder that creates the content of the list.
     ///   - errorStateView: A view builder that creates the view for the error state of the list.
     ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
-    public init<Content: View>(listState: ListState, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+    public init<Content: View>(listState: ListState = .items, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
         self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(content: content)) }))
+        self.listState = listState
+        self.emptyStateView = { EmptyStateView() }
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        configurations = []
+    }
+
+    /// Initializes the list with the given content that supports selecting a single row.
+    /// Uses the native `SwiftUI` `List` as list view.
+    ///
+    /// - Parameters:
+    ///   - listState: A value representing the state of the list, defaults to `items`.
+    ///   - selection: A binding to a selected value.
+    ///   - content: A view builder that creates the content of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<SelectionValue?>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
+        self.listState = listState
+        self.emptyStateView = { EmptyStateView() }
+        self.errorStateView = errorStateView
+        self.loadingStateView = loadingStateView
+        configurations = []
+    }
+
+    /// Initializes the list with the given content that supports selecting multiple rows.
+    /// Uses the native `SwiftUI` `List` as list view.
+    ///
+    /// - Parameters:
+    ///   - listState: A value representing the state of the list, defaults to `items`.
+    ///   - selection: A binding to a set that identifies selected rows.
+    ///   - content: A view builder that creates the content of the list.
+    ///   - errorStateView: A view builder that creates the view for the error state of the list.
+    ///   - loadingStateView: A view builder that creates the view for the loading state of the list.
+    public init<Content: View, SelectionValue: Hashable>(listState: ListState = .items, selection: Binding<Set<SelectionValue>>?, @ViewBuilder content: @escaping () -> Content, @ViewBuilder errorStateView: @escaping (Error) -> ErrorStateView, @ViewBuilder loadingStateView: @escaping () -> LoadingStateView) {
+        self.type = .init(type: AdvancedListType<Never>.container(content: { AnyView(List(selection: selection, content: content)) }))
         self.listState = listState
         self.emptyStateView = { EmptyStateView() }
         self.errorStateView = errorStateView
@@ -188,17 +224,13 @@ private extension AdvancedList {
     @ViewBuilder
     func itemView(_ item: AnyIdentifiable) -> some View {
         switch type.value {
-        case let .data(_, _, rowContent):
+        case let .data(data, _, rowContent):
             rowContent(item)
             .onAppear {
                 listItemAppears(item)
 
-                switch type.value {
-                case let .data(data, _, _):
-                    if data.isLastItem(item) {
-                        isLastItem = true
-                    }
-                case .container: ()
+                if data.isLastItem(item) {
+                    isLastItem = true
                 }
             }
         case .container:

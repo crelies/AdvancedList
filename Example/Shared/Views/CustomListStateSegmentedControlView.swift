@@ -38,12 +38,14 @@ struct CustomListStateSegmentedControlView : View {
 
             Button(action: {
                 listState = .loading
+                paginationState = .idle
             }) {
                 Text("Loading")
             }
 
             Button(action: {
                 listState = .error(ExampleError.allCases.randomElement()! as NSError)
+                paginationState = .idle
             }) {
                 Text("Error")
             }

@@ -24,10 +24,7 @@ struct AdvancedListExampleApp: App {
             NavigationView {
                 List {
                     NavigationLink("Data example", destination: DataExampleView())
-
-                    if #available(iOS 15, *) {
-                        NavigationLink("Content example", destination: ContentExampleView())
-                    }
+                    NavigationLink("Content example", destination: ContentExampleView())
                 }
                 .navigationTitle("Examples")
             }

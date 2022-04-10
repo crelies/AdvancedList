@@ -63,6 +63,27 @@ AdvancedList(yourData, listView: { rows in
 })
 ```
 
+### 🆕 Custom Content view
+
+Starting from version `8.0.0` you have full freedom & control over the content view rendered in the `items` state of your `AdvancedList`. Use a `SwiftUI List` or a `custom view`.
+
+Upgrade from version `7.0.0` **without breaking anything** and use the new API:
+
+```swift
+AdvancedList(listState: yourListState, content: {
+    VStack {
+        Text("Row 1")
+        Text("Row 2")
+        Text("Row 3")
+    }
+}, errorStateView: { error in
+    VStack(alignment: .leading) {
+        Text("Error").foregroundColor(.primary)
+        Text(error.localizedDescription).foregroundColor(.secondary)
+    }
+}, loadingStateView: ProgressView.init)
+```
+
 ### 📄 Pagination
 
 The `Pagination` functionality is now (>= `5.0.0`) implemented as a `modifier`.
@@ -476,4 +497,9 @@ AdvancedList(yourData, content: { item in
     Text("Loading ...")
 }, pagination: .noPagination)
 ```
+</details>
+
+<details>
+<summary>Migration 7.0 -> 8.0</summary>
+Nothing to do 🎉
 </details>

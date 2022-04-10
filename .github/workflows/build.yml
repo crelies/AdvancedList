@@ -16,6 +16,6 @@ jobs:
     - name: Generate Xcode project
       run: swift package generate-xcodeproj
     - name: Test
-      run: xcodebuild clean test -destination 'name=iPhone 8' -scheme AdvancedList-Package -enableCodeCoverage YES -derivedDataPath .build/derivedData -quiet
+      run: xcodebuild clean test -destination 'name=iPhone 8' -scheme AdvancedList -enableCodeCoverage YES -derivedDataPath .build/derivedData -quiet
     - name: Upload Test coverage data
       run: bash <(curl -s https://codecov.io/bash) -J '^AdvancedList$' -D .build/derivedData

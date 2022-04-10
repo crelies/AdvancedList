@@ -22,15 +22,24 @@ struct ContentExampleView: View {
             )
 
             AdvancedList(listState: listState, content: {
-                Text("Example 1")
-                Text("Example 2")
-                Text("Example 3")
+                VStack {
+                    Text("Example 1")
+                    Text("Example 2")
+                    Text("Example 3")
+                }
+                .frame(maxHeight: .infinity)
             }, errorStateView: { error in
                 VStack(alignment: .leading) {
                     Text("Error").foregroundColor(.primary)
                     Text(error.localizedDescription).foregroundColor(.secondary)
                 }
-            }, loadingStateView: ProgressView.init)
+                .frame(maxHeight: .infinity)
+            }, loadingStateView: {
+                VStack {
+                    ProgressView()
+                }
+                .frame(maxHeight: .infinity)
+            })
 
             Spacer()
         }

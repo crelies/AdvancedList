@@ -44,11 +44,20 @@ private extension DataExampleView {
         let advancedList = AdvancedList(items, content: { item in
             view(for: item)
         }, listState: listState, emptyStateView: {
-            Text("No data")
+            VStack {
+                Text("No data")
+            }
+            .frame(maxHeight: .infinity)
         }, errorStateView: { error in
-            Text("\(error.localizedDescription)").lineLimit(nil)
+            VStack {
+                Text("\(error.localizedDescription)").lineLimit(nil)
+            }
+            .frame(maxHeight: .infinity)
         }, loadingStateView: {
-            ProgressView()
+            VStack {
+                ProgressView()
+            }
+            .frame(maxHeight: .infinity)
         })
         .pagination(.init(type: .lastItem, shouldLoadNextPage: loadNextItems) {
             switch paginationState {

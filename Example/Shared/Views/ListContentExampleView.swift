@@ -30,7 +30,13 @@ struct ListContentExampleView: View {
                     Text("Error").foregroundColor(.primary)
                     Text(error.localizedDescription).foregroundColor(.secondary)
                 }
-            }, loadingStateView: ProgressView.init)
+                .frame(maxHeight: .infinity)
+            }, loadingStateView: {
+                VStack {
+                    ProgressView()
+                }
+                .frame(maxHeight: .infinity)
+            })
 
             Spacer()
         }

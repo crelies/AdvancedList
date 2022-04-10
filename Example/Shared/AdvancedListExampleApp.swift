@@ -24,6 +24,7 @@ struct AdvancedListExampleApp: App {
             NavigationView {
                 List {
                     NavigationLink("Data example", destination: DataExampleView())
+                    NavigationLink("List content example", destination: ListContentExampleView())
                     NavigationLink("Content example", destination: ContentExampleView())
                 }
                 .navigationTitle("Examples")

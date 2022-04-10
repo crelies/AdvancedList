@@ -1,15 +1,15 @@
 //
-//  ContentExampleView.swift
+//  ListContentExampleView.swift
 //  AdvancedList-Example
 //
-//  Created by Christian Elies on 30/03/2022.
+//  Created by Christian Elies on 10/04/2022.
 //  Copyright © 2022 Christian Elies. All rights reserved.
 //
 
 import AdvancedList
 import SwiftUI
 
-struct ContentExampleView: View {
+struct ListContentExampleView: View {
     @State private var listState: ListState = .items
 
     var body: some View {
@@ -21,7 +21,7 @@ struct ContentExampleView: View {
                 shouldHideEmptyOption: true
             )
 
-            AdvancedList(listState: listState, content: {
+            AdvancedList(listState: listState, listContent: {
                 Text("Example 1")
                 Text("Example 2")
                 Text("Example 3")
@@ -34,14 +34,14 @@ struct ContentExampleView: View {
 
             Spacer()
         }
-        .navigationTitle("Content example")
+        .navigationTitle("List content example")
     }
 }
 
 #if DEBUG
-struct ContentExampleView_Previews: PreviewProvider {
+struct ListContentExampleView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentExampleView()
+        ListContentExampleView()
     }
 }
 #endif

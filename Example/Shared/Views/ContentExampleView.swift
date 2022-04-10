@@ -17,7 +17,8 @@ struct ContentExampleView: View {
             CustomListStateSegmentedControlView(
                 items: .constant([]),
                 listState: $listState,
-                paginationState: .constant(.idle)
+                paginationState: .constant(.idle),
+                shouldHideEmptyOption: true
             )
 
             AdvancedList(listState: listState) {

@@ -13,6 +13,7 @@ struct CustomListStateSegmentedControlView : View {
     @Binding var items: [AnyIdentifiable]
     @Binding var listState: ListState
     @Binding var paginationState: AdvancedListPaginationState
+    var shouldHideEmptyOption = false
 
     var body: some View {
         HStack {
@@ -27,13 +28,15 @@ struct CustomListStateSegmentedControlView : View {
                 Text("Items")
             }
 
-            Button(action: {
-                items.removeAll()
+            if !shouldHideEmptyOption {
+                Button(action: {
+                    items.removeAll()
 
-                listState = .items
-                paginationState = .idle
-            }) {
-                Text("Empty")
+                    listState = .items
+                    paginationState = .idle
+                }) {
+                    Text("Empty")
+                }
             }
 
             Button(action: {

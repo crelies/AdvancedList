@@ -182,7 +182,7 @@ AdvancedList(yourData, content: { item in
 })
 ```
 
-For more examples take a look at [AdvancedList-SwiftUI](https://github.com/crelies/AdvancedList-SwiftUI).
+For more examples take a look at the `Example` directory.
 
 ## Migration
 
